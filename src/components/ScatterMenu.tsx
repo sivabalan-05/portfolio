@@ -1,0 +1,456 @@
+"use client";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import HeroButton from "./HeroButton";
+import { useCreativeStudio } from "./CreativeStudio";
+
+/**
+ * Menu criativo (referência: os rótulos soltos do barbianaliu.com, na NOSSA
+ * linguagem): etiquetas lime de canto pixelado espalhadas pelo hero, cada uma
+ * balançando no próprio ritmo. Surpresa: ao rolar além do hero, o menu se
+ * "descola" e vira um molhinho fixo no canto, acompanhando a visita.
+ * Sem barra de navegação tradicional.
+ */
+
+export type MenuItem = {
+  label: string;
+  href: string;        // "#ancora" ou "/rota"
+  left: string;        // posição no hero
+  top: string;
+  rotate: number;
+  priority: "primary" | "secondary" | "tertiary";
+  previews?: { src: string; alt: string }[];
+};
+
+const styles = `
+  .sm__tag-wrapper {
+    position: absolute;
+    z-index: 25;
+    display: inline-block;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    will-change: translate;
+  }
+  .sm__tag-wrapper[data-dragging="true"] {
+    z-index: 30;
+    cursor: grabbing;
+  }
+  .sm__tag-wrapper:focus-within {
+    outline: 2px dotted var(--site-ink);
+    outline-offset: 4px;
+  }
+  .sm__label {
+    font-family: var(--font-subtitle), monospace;
+    font-size: .95rem;
+    font-weight: var(--offbit-weight-active);
+    text-transform: lowercase;
+    letter-spacing: var(--offbit-letter-spacing);
+  }
+  .sm__label {
+    display: inline-flex;
+    align-items: center;
+    gap: .42rem;
+  }
+  .sm__tag--hero {
+    opacity: var(--tag-opacity, .8);
+    transform: rotate(var(--tag-rotate, 0deg));
+    animation: sm-tag-in .45s cubic-bezier(.16, 1, .3, 1) var(--tag-delay, 1.3s) both;
+    transition:
+      opacity .3s ease,
+      transform .35s cubic-bezier(.16, 1, .3, 1);
+  }
+  .sm__tag--hero[data-pinned="true"] {
+    opacity: 0;
+    transform: scale(.6) rotate(var(--tag-rotate, 0deg));
+    pointer-events: none;
+  }
+  @keyframes sm-tag-in {
+    from { opacity: 0; transform: scale(.5) rotate(var(--tag-rotate, 0deg)); }
+    to { opacity: var(--tag-opacity, .8); transform: scale(1) rotate(var(--tag-rotate, 0deg)); }
+  }
+  .sm__tag[data-priority="primary"] {
+    font-family: var(--font-subtitle), monospace;
+    font-size: 1.18rem;
+    font-weight: var(--offbit-weight-active);
+    letter-spacing: var(--offbit-letter-spacing);
+    padding: .75rem 1.45rem;
+    box-shadow:
+      0 0 0 8px color-mix(in srgb, var(--paper) 86%, transparent),
+      7px 7px 0 color-mix(in srgb, var(--ink) 20%, transparent);
+  }
+  .sm__tag[data-priority="primary"]::after { content: " ↘"; }
+  .sm__portal {
+    position: absolute;
+    top: calc(100% + .8rem);
+    right: 0;
+    width: min(22rem, 52vw);
+    height: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    padding: 0;
+    overflow: hidden;
+    opacity: 0;
+    background: var(--paper);
+    box-shadow: 7px 8px 0 color-mix(in srgb, var(--ink) 15%, transparent);
+    transform: scaleY(.15);
+    transform-origin: top;
+    transition: height .42s cubic-bezier(.16,1,.3,1), opacity .25s ease, transform .42s cubic-bezier(.16,1,.3,1), padding .42s cubic-bezier(.16,1,.3,1);
+  }
+  .sm__portal-frame {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    filter: grayscale(1) contrast(1.08);
+  }
+  .sm__portal-frame img { object-fit: cover; }
+  .sm__tag[data-priority="primary"]:hover .sm__portal,
+  .sm__tag[data-priority="primary"]:focus-visible .sm__portal {
+    height: 7rem;
+    padding: 4px;
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  .sm__tag[data-priority="secondary"] {
+    font-size: 1.02rem;
+    padding: .62rem 1.25rem;
+    opacity: .95;
+    box-shadow:
+      0 0 0 5px color-mix(in srgb, var(--paper) 70%, transparent),
+      5px 5px 0 color-mix(in srgb, var(--ink) 16%, transparent);
+  }
+  .sm__tag[data-priority="tertiary"] {
+    font-size: .95rem;
+    padding: .58rem 1.18rem;
+    opacity: .88;
+    box-shadow:
+      0 0 0 4px color-mix(in srgb, var(--paper) 62%, transparent),
+      4px 4px 0 color-mix(in srgb, var(--ink) 13%, transparent);
+  }
+  .sm__cluster {
+    position: fixed;
+    right: 1.2rem;
+    /* acima do botão flutuante de voltar ao topo, que ficava por cima */
+    bottom: 5.5rem;
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .45rem;
+    animation: sm-cluster-in .4s cubic-bezier(.16, 1, .3, 1) both;
+  }
+  .sm__cluster > .sm__tag-wrapper {
+    animation: sm-cluster-item-in .3s cubic-bezier(.16, 1, .3, 1) var(--tag-delay, 0s) both;
+  }
+  @keyframes sm-cluster-in {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes sm-cluster-item-in {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: var(--tag-opacity, .8); transform: translateX(0) rotate(var(--tag-rotate, 0deg)); }
+  }
+  .sm__cluster .sm__tag {
+    position: static;
+    animation: none;
+    min-height: var(--tap-min);
+    display: inline-flex;
+    align-items: center;
+    font-size: var(--type-micro);
+    padding: .58rem .75rem;
+  }
+  .sm__cluster .sm__tag[data-priority="primary"] {
+    order: -1;
+    font-size: var(--type-micro);
+    box-shadow:
+      0 0 0 4px color-mix(in srgb, var(--paper) 74%, transparent),
+      3px 3px 0 color-mix(in srgb, var(--ink) 14%, transparent);
+  }
+  .sm__cluster .sm__portal { display: none; }
+  @media (max-width: 720px) {
+    .sm__tag { font-size: var(--type-label); padding: .55rem .7rem; }
+    /* em tela estreita o molhinho vertical tapava as legendas dos projetos:
+       vira uma fita horizontal no rodapé, à esquerda do botão de topo */
+    .sm__cluster {
+      flex-direction: row;
+      align-items: center;
+      /* Uma faixa acima dos dois botões fixos do rodapé (o redondo à esquerda
+         e o "topo" à direita), usando a largura inteira: assim os três links
+         cabem sem scroll e sem cair em cima da legenda dos trabalhos, que era
+         o problema que este bloco queria resolver. */
+      left: .5rem;
+      right: .5rem;
+      bottom: 4.4rem;
+      gap: .28rem;
+      /* uma linha só: quebrando em duas ele tapava a legenda dos projetos */
+      flex-wrap: nowrap;
+      justify-content: center;
+      overflow-x: auto;
+      scrollbar-width: none;
+      /* a fita rola: a máscara sinaliza "tem mais para o lado" em vez de
+         cortar a última etiqueta no meio da palavra */
+      -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.6rem), transparent);
+      mask-image: linear-gradient(to right, #000 calc(100% - 1.6rem), transparent);
+      padding-right: 1.6rem;
+    }
+    .sm__cluster::-webkit-scrollbar { display: none; }
+    .sm__cluster .sm__tag {
+      flex: 0 0 auto;
+      font-size: var(--type-micro);
+      padding: .52rem .62rem;
+      letter-spacing: .04em;
+    }
+    /* No mobile, a navegação é uma trilha visual estável abaixo do título.
+       O !important também evita que o estado inicial do Motion a deixe invisível
+       em navegadores que suspendem animações durante a primeira pintura. */
+    .sm__tag--hero {
+      display: inline-block !important;
+      visibility: visible !important;
+      animation: none !important;
+    }
+    /* Sem nowrap as etiquetas quebravam em três linhas ("[ ver / projetos / ]")
+       e ainda assim vazavam pela direita da tela. Com uma linha só, as
+       posições abaixo mantêm a etiqueta inteira dentro da viewport. */
+    /* O elemento renderizado é .sm__label (.sm__tag não existe no HTML), e sem
+       nowrap toda etiqueta quebrava em três linhas — no hero e na fita. */
+    .sm__label { white-space: nowrap; }
+    .sm__tag--hero[data-priority="primary"] {
+      left: 44% !important; top: 64% !important;
+      opacity: 1 !important; transform: rotate(2deg) !important;
+      font-size: .92rem;
+    }
+    .sm__tag--hero[data-priority="secondary"] {
+      left: 7% !important; top: 76% !important;
+      opacity: .95 !important; transform: rotate(-2deg) !important;
+      font-size: .88rem;
+    }
+    .sm__tag--hero[data-priority="tertiary"] {
+      left: 44% !important; top: 81% !important;
+      opacity: .88 !important; transform: rotate(1deg) !important;
+      font-size: .84rem;
+    }
+    .sm__cluster .sm__tag[data-priority="primary"]::after { content: ""; }
+    .sm__portal { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sm__tag { transition: none; }
+  }
+`;
+
+function go(e: React.MouseEvent<HTMLElement>, href: string) {
+  if (href.startsWith("#")) {
+    e.preventDefault();
+    if (href === "#about") window.dispatchEvent(new Event("studio:reveal-about"));
+    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+  }
+  // rotas ("/experiments") seguem o fluxo normal (transição do Curtains)
+}
+
+function DraggableHeroTag({
+  item,
+  index,
+  pinned,
+}: {
+  item: MenuItem;
+  index: number;
+  pinned: boolean;
+}) {
+  const elementRef = useRef<HTMLDivElement>(null);
+  const offsetRef = useRef({ x: 0, y: 0 });
+  const dragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+    moved: boolean;
+  } | null>(null);
+  const suppressClickRef = useRef(false);
+  const { markMoved, playSound, resetToken } = useCreativeStudio();
+
+  useEffect(() => {
+    offsetRef.current = { x: 0, y: 0 };
+    if (elementRef.current) elementRef.current.style.translate = "";
+  }, [resetToken]);
+
+  const finishDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    dragRef.current = null;
+    event.currentTarget.dataset.dragging = "false";
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (drag.moved) {
+      suppressClickRef.current = true;
+      markMoved();
+      playSound("drag");
+    }
+  };
+
+  return (
+    <div
+      ref={elementRef}
+      className="sm__tag-wrapper sm__tag--hero"
+      /* Sem este atributo as regras .sm__tag--hero[data-priority=…] do bloco
+         @media (max-width: 720px) não casavam com nada: no celular as
+         etiquetas ficavam nas coordenadas de desktop e vazavam pela direita. */
+      data-priority={item.priority}
+      data-pinned={pinned ? "true" : "false"}
+      data-dragging="false"
+      data-no-stamp
+      style={{
+        left: item.left,
+        top: item.top,
+        "--tag-opacity": item.priority === "primary" ? 1 : item.priority === "secondary" ? .92 : .78,
+        "--tag-rotate": `${item.rotate}deg`,
+        "--tag-delay": `${1.3 + index * .12}s`,
+      } as React.CSSProperties}
+      onPointerDown={(event) => {
+        if (pinned || event.button !== 0 || window.innerWidth <= 720) return;
+        const element = elementRef.current;
+        const hero = element?.closest<HTMLElement>(".ph");
+        if (!element || !hero) return;
+        const rect = element.getBoundingClientRect();
+        const bounds = hero.getBoundingClientRect();
+        dragRef.current = {
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          minX: bounds.left - rect.left,
+          maxX: bounds.right - rect.right,
+          minY: bounds.top - rect.top,
+          maxY: bounds.bottom - rect.bottom,
+          moved: false,
+        };
+        suppressClickRef.current = false;
+      }}
+      onPointerMove={(event) => {
+        const drag = dragRef.current;
+        const element = elementRef.current;
+        if (!drag || drag.pointerId !== event.pointerId || !element) return;
+        const deltaX = event.clientX - drag.startX;
+        const deltaY = event.clientY - drag.startY;
+        if (!drag.moved && Math.hypot(deltaX, deltaY) < 4) return;
+        if (!drag.moved) {
+          /* A captura so entra depois que o arrasto passa do limiar. Se ela
+             fosse ligada ja no pointerdown, o pointerup e o click seriam
+             redirecionados para este wrapper e a ancora dentro dele nunca
+             receberia o clique - os botoes do hero paravam de navegar. */
+          drag.moved = true;
+          element.dataset.dragging = "true";
+          element.setPointerCapture(event.pointerId);
+        }
+        const x = offsetRef.current.x + Math.min(drag.maxX, Math.max(drag.minX, deltaX));
+        const y = offsetRef.current.y + Math.min(drag.maxY, Math.max(drag.minY, deltaY));
+        element.style.translate = `${x}px ${y}px`;
+      }}
+      onPointerUp={(event) => {
+        const drag = dragRef.current;
+        if (drag?.moved) {
+          const deltaX = event.clientX - drag.startX;
+          const deltaY = event.clientY - drag.startY;
+          offsetRef.current = {
+            x: offsetRef.current.x + Math.min(drag.maxX, Math.max(drag.minX, deltaX)),
+            y: offsetRef.current.y + Math.min(drag.maxY, Math.max(drag.minY, deltaY)),
+          };
+        }
+        finishDrag(event);
+      }}
+      onPointerCancel={finishDrag}
+    >
+      <HeroButton
+        href={item.href}
+        onClick={(event) => {
+          if (suppressClickRef.current) {
+            suppressClickRef.current = false;
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+          go(event, item.href);
+        }}
+        className="sm__label"
+      >
+        {`[ ${item.label} ]`}
+      </HeroButton>
+      {item.previews?.length ? (
+        <span className="sm__portal" aria-hidden="true">
+          {item.previews.slice(0, 3).map((preview) => (
+            <span className="sm__portal-frame" key={preview.src}>
+              <Image src={preview.src} alt="" fill sizes="120px" />
+            </span>
+          ))}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+export default function ScatterMenu({ items }: { items: MenuItem[] }) {
+  const [pinned, setPinned] = useState(false);
+  const [footerVisible, setFooterVisible] = useState(false);
+
+  // além do hero (~1 tela), o menu vira molhinho fixo no canto
+  useEffect(() => {
+    const onScroll = () => setPinned(window.scrollY > window.innerHeight * 0.85);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const footer = document.querySelector("#contact");
+    if (!footer) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setFooterVisible(entry.isIntersecting),
+      { threshold: .02 },
+    );
+    observer.observe(footer);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <nav aria-label="menu">
+      <style>{styles}</style>
+
+      {/* etiquetas espalhadas no hero */}
+      {items.map((it, i) => (
+        <DraggableHeroTag
+          key={it.label}
+          item={it}
+          index={i}
+          pinned={pinned}
+        />
+      ))}
+
+      {/* molhinho fixo no canto depois que o hero sai de cena */}
+      {pinned && !footerVisible && (
+          <div
+            className="sm__cluster"
+          >
+            {items.map((it, i) => (
+              <div
+                key={it.label}
+                className="sm__tag-wrapper"
+                style={{
+                  position: "relative",
+                  display: "inline-block",
+                  "--tag-opacity": it.priority === "primary" ? 1 : it.priority === "secondary" ? .92 : .78,
+                  "--tag-rotate": `${i % 2 ? 2 : -2}deg`,
+                  "--tag-delay": `${i * .06}s`,
+                } as React.CSSProperties}
+              >
+                <HeroButton href={it.href} onClick={(e) => go(e, it.href)} className="sm__label">
+                  {`[ ${it.label} ]`}
+                </HeroButton>
+              </div>
+            ))}
+          </div>
+      )}
+    </nav>
+  );
+}

@@ -1,0 +1,8 @@
+# Relatórios e artefatos locais das sessões de validação
+.codex-*
+.codex-fonttools/
+.conv-tmp.mjs
+
+# Metadados de agentes locais
+.agents/
+.claude/
