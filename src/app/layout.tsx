@@ -6,6 +6,7 @@ import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import FloatingBackToTop from "@/components/FloatingBackToTop";
 import AdaptiveCursor from "@/components/AdaptiveCursor";
+import DesktopLoreWarning from "@/components/DesktopLoreWarning";
 import { PageTransitionProvider } from "@/components/Curtains";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 
@@ -201,6 +202,7 @@ export default function RootLayout({
           `}
         </Script>
         <LanguageProvider>
+          <DesktopLoreWarning />
           <SmoothScroll>
             {/* Cursor fica FORA do PageTransitionProvider de propósito: o wrapper de
                 transição aplica transform durante a saída, o que quebraria o
