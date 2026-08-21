@@ -302,11 +302,14 @@ const styles = `
     white-space: nowrap;
     pointer-events: none;
   }
-  @media (max-width: 720px) {
+  @media (max-width: 768px) {
     .ph {
       height: auto;
-      min-height: max(100svh, 54rem);
-      padding: 7rem 1.25rem 1.5rem;
+      min-height: 100svh;
+      padding: 6rem 1.25rem 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
     .ph__meta span:nth-child(2) { display: none; }
     .ph__title {
@@ -316,33 +319,40 @@ const styles = `
       top: auto;
       font-family: var(--font-pixelscript);
       font-weight: 400;
-      font-size: clamp(2rem, 10.6vw, 2.75rem);
-      line-height: 1.08;
+      font-size: clamp(1.85rem, 8.8vw, 2.75rem);
+      line-height: 1.12;
       letter-spacing: -.015em;
-      margin: 7.5rem 0 10rem;
-      translate: 0 -6svh;
+      margin: 1.25rem 0 1rem;
+      translate: none;
+      text-align: left;
     }
     .ph__title[data-compact="true"] {
-      font-size: clamp(1.75rem, 9.2vw, 2.4rem);
-      line-height: 1.08;
+      font-size: clamp(1.65rem, 8vw, 2.35rem);
+      line-height: 1.12;
     }
     .ph__sub--pocket {
-      position: static;
-      width: auto;
+      position: relative;
+      left: auto;
+      top: auto;
+      width: 100%;
       max-width: 100%;
-      margin-top: 1.25rem;
-      translate: 0 -4svh;
+      margin-top: 1rem;
+      translate: none;
+      font-size: clamp(.85rem, 3.8vw, 1.05rem);
+      line-height: 1.45;
     }
     .ph__sub-line { white-space: normal; }
     .ph__sticker--desk { display: none; }
     .ph__sticker { cursor: default; }
     .ph__sticker--clock {
+      position: relative;
       left: auto !important;
-      right: 1.25rem;
-      top: 23% !important;
-      text-align: right;
+      right: auto !important;
+      top: auto !important;
+      margin-bottom: 0.5rem;
+      text-align: left;
     }
-    .ph__greet { font-size: 1.2rem; }
+    .ph__greet { font-size: 1.15rem; }
     .ph__note { font-size: var(--type-micro); }
   }
   @media (prefers-reduced-motion: reduce) {

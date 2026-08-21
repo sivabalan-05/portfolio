@@ -190,12 +190,14 @@ export default function BarbianaPortrait({
         @media (max-width: 860px) {
           .barbiana-cutout {
             position: relative;
-            margin: 2rem auto 1rem;
+            margin: 1.5rem auto 1rem;
             left: auto !important;
             right: auto !important;
             top: auto !important;
             bottom: auto !important;
-            width: min(75vw, 320px);
+            width: min(65vw, 240px);
+            aspect-ratio: 1 / 1.45;
+            display: block;
           }
         }
       `}</style>
