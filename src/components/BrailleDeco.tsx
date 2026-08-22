@@ -3,24 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 /**
- * Ornamento em arte braille (as que ela escolheu). Separado do AsciiAnim porque
- * as exigências de renderização são outras:
- *
- * - fonte: SÓ a BrailleMono tem os glifos (var(--font-braille)); a mono do site
- *   não tem. Sem isso é tofu.
- * - line-height 1: o glifo braille já é desenhado do topo à base da célula, então
- *   qualquer entrelinha extra abre fresta horizontal e o desenho vira listra.
- * - letter-spacing 0: idem na horizontal.
- *
- * Largura = cols * 0.732em (avanço do glifo no DejaVu, 1500/2048).
- *
- * "Acorda ao passar" (pedido dela): ao entrar na viewport, os caracteres
- * embaralham em braille aleatório e RESOLVEM no desenho — como um sinal sendo
- * captado. Usa setInterval (não rAF), então funciona mesmo em abas/painéis com
- * requestAnimationFrame pausado. Espaços e quebras de linha ficam intactos pra
- * não deformar o desenho.
+ * Braille Unicode Decorative Ornament:
+ * Renders high-density Unicode dot-matrix patterns using the dedicated Braille font.
+ * Reanimates with a brief scatter & resolve effect when entering viewport.
  */
-const BRAILLE_BASE = 0x2800; // U+2800..U+28FF = 256 padrões de braille
+const BRAILLE_BASE = 0x2800; // U+2800..U+28FF = 256 Braille dot patterns
 
 export default function BrailleDeco({
   art,

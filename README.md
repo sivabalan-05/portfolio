@@ -40,7 +40,7 @@
 
 ## 🌟 Key Highlights & Creative Features
 
-- **✦ Barbiana Liu Aesthetic Layering**: Transparent full-body silhouette cutout with multi-depth typography sandwich layering and interactive pixel-velocity mosaic shaders.
+- **✦ Signature Editorial Cutout Layering**: Transparent full-body silhouette cutout with multi-depth typography sandwich layering and interactive pixel-velocity mosaic shaders.
 - **✦ Interactive Canvas ASCII Shaders**: Procedurally animated Kanagawa wave and typography rendered via Unicode Braille and delicate glyphs.
 - **✦ Inertial Smooth Scrolling**: Powered by Lenis for buttery 60fps editorial transitions.
 - **✦ Creative Studio Controls**: Dynamic paper switchers (Warm Paper, Cyanotype, Vellum) and interactive sticker/stamp playground.
@@ -82,7 +82,7 @@ portfolio/
 │   │   ├── layout.tsx         # Global layout, SEO metadata & theme providers
 │   │   └── page.tsx           # Main editorial hero & sections
 │   ├── components/
-│   │   ├── BarbianaPortrait.tsx   # Interactive portrait with depth layering & mosaic shader
+│   │   ├── HeroPortrait.tsx       # Interactive portrait with depth layering & mosaic shader
 │   │   ├── PlaygroundHero.tsx     # Typography hero with ASCII waves & sticker playground
 │   │   ├── ScatteredWorks.tsx     # Editorial project showcases
 │   │   ├── SkillConstellation.tsx # Interactive skill graph visualization

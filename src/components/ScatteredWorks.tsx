@@ -25,11 +25,11 @@ type DragState = {
   velocity: number;
 };
 
-/** Quanto tempo de deslize o impulso do arraste projeta à frente, em ms. */
+/** Momentum coast duration in milliseconds. */
 const GLIDE_PROJECTION = 210;
-/** Abaixo disso o gesto conta como parado: só encaixa no cartão mais próximo. */
+/** Velocity cutoff below which inertia snaps to closest item. */
 const FLICK_THRESHOLD = .05;
-/** Folga em px antes de um clique virar arraste. */
+/** Drag gesture threshold in pixels. */
 const DRAG_THRESHOLD = 3;
 
 const styles = `
@@ -424,7 +424,7 @@ export default function ScatteredWorks({ items }: { items: IndexItem[] }) {
     glideRafRef.current = 0;
   }, []);
 
-  /** Onde cada cartão encosta na borda esquerda da janela. */
+  /** Calculate target scroll position for card alignment. */
   const snapPoints = useCallback(() => {
     const viewport = viewportRef.current;
     if (!viewport) return [];
@@ -448,7 +448,7 @@ export default function ScatteredWorks({ items }: { items: IndexItem[] }) {
     );
   }, [snapPoints]);
 
-  /** Leva a fita até o destino com desaceleração — nada de corte seco. */
+  /** Smooth inertial deceleration to target snap position. */
   const glideTo = useCallback((target: number, duration: number) => {
     const viewport = viewportRef.current;
     if (!viewport) return;
@@ -479,7 +479,7 @@ export default function ScatteredWorks({ items }: { items: IndexItem[] }) {
     glideRafRef.current = requestAnimationFrame(step);
   }, [scheduleControlsUpdate, stopGlide]);
 
-  /** Um cartão por clique, em vez de uma distância arbitrária. */
+  /** Step precisely one card index per navigation trigger. */
   const scrollGallery = (direction: -1 | 1) => {
     const viewport = viewportRef.current;
     if (!viewport) return;

@@ -1,6 +1,4 @@
-/* PF Pixelscript (caligrafia pixelada, escolha dela) — servida pelo Adobe Fonts
-   (web project dela); o visitante NÃO precisa ter a fonte. Se a assinatura
-   Adobe expirar, cai no fallback definido em --font-pixelscript. */
+/* PF Pixelscript & typographic design tokens with web font fallback */
 @import "tailwindcss";
 
 @keyframes miniAsciiPulse {
@@ -11,7 +9,7 @@
 
 
 /* ==========================================
-   PALETA DO SITE — trocar AQUI muda o site todo
+   GLOBAL PALETTE & DESIGN TOKENS
    ========================================== */
 :root {
     --font-subtitle: var(--font-offbit), monospace;

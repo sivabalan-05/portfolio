@@ -21,7 +21,7 @@ export default function Curtains() {
 
 type Status = "idle" | "entrance" | "exit";
 
-// Duração total da transição (fade out de uma tela e in da próxima)
+// Total transition duration across route navigation
 const EXIT = 650;
 const ENTER = 650;
 
@@ -41,7 +41,7 @@ const transitionStyles = `
 
 function PixelGrid({ status, richMotion }: { status: Status; richMotion: boolean }) {
   const [grid, setGrid] = useState({ cols: 0, rows: 0 });
-  const TILE_SIZE = 80; // tamanho fixo de cada bloco
+  const TILE_SIZE = 80; // Fixed tile size
   const isMoving = status !== "idle";
   const isExit = status === "exit";
 
@@ -57,7 +57,7 @@ function PixelGrid({ status, richMotion }: { status: Status; richMotion: boolean
     return () => window.removeEventListener("resize", calc);
   }, []);
 
-  // A grade só existe durante a troca de rota. Antes, centenas de nós
+  // Tile grid is only mounted during active navigation
   // transparentes ficavam montados durante toda a visita.
   if (!isMoving || grid.cols === 0) return null;
 

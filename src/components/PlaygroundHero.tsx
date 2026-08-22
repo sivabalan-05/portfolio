@@ -4,7 +4,7 @@ import ScrambleText from "./ScrambleText";
 import { useT } from "@/i18n/LanguageContext";
 import { StampCanvas, useCreativeStudio } from "./CreativeStudio";
 
-/* canto em degrau de 8px — recorte "pixel" nas molduras */
+/* 8px stepped pixel clip-path for retro-editorial frames */
 export const PIXEL_CLIP =
   "polygon(0 8px, 8px 8px, 8px 0, calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px))";
 
@@ -41,7 +41,7 @@ const CLOCK_GREETINGS: Record<
     ],
     morning: ["morning, i guess?"],
     afternoon: [
-      "business hours, apparently",
+      "College hours, apparently",
       "productivity, allegedly",
       "technically still a workday",
       "mid-shift, morally speaking",
@@ -53,11 +53,11 @@ const CLOCK_GREETINGS: Record<
 function clockPeriodFor(hour: number): ClockPeriod {
   if (hour < 6) return "late";
   if (hour < 12) return "morning";
-  if (hour < 18) return "afternoon";
+  if (hour < 17) return "afternoon";
   return "evening";
 }
 
-/** Relógio ao vivo (referência: barbianaliu.com — "Mon 01:39:03 AM"). */
+/** Live clock & contextual greeting component */
 function LiveClock() {
   const { lang } = useT();
   const [now, setNow] = useState("");
@@ -131,9 +131,9 @@ function LiveClock() {
 const styles = `
   .ph {
     position: relative;
-    background: transparent; /* deixa o degradê+ruído do .rm aparecer */
+    background: transparent; /* Transparent background to allow grain & gradient blend */
     color: var(--ink);
-    /* Uma tela exata: a gravura é enquadrada e recortada, não exibida inteira. */
+    /* Exact 100svh viewport framing */
     height: 100svh;
     min-height: 100svh;
     display: flex;
@@ -155,7 +155,7 @@ const styles = `
     z-index: 1;
   }
   .ph__title {
-    /* PF Pixelscript (Adobe) como display do hero — escala equilibrada com respiro */
+    /* PF Pixelscript hero headline with responsive scaling */
     font-family: var(--font-pixelscript);
     font-weight: 400;
     font-size: clamp(2rem, min(7.5vw, 9.5vh), 6.5rem);
@@ -212,12 +212,12 @@ const styles = `
     font-size: clamp(.95rem, 1.3vw, 1.1rem);
     line-height: 1.5;
   }
-  /* frase no vazio da onda: OffBit, alinhada à esquerda, abaixo do título */
+  /* Subtitle positioned with clean left alignment */
   .ph__sub--pocket {
     position: absolute;
     left: 45.6%;
     top: 79%;
-    /* duas linhas editoriais fixas; a largura evita qualquer reflow acidental */
+    /* Fixed editorial subtitle width prevents layout reflow */
     width: max-content;
     max-width: 50vw;
     max-width: none;
@@ -291,7 +291,7 @@ const styles = `
   }
   .ph__clock { display: inline-flex; flex-direction: column; gap: .15rem; }
   .ph__greet {
-    /* fonte de pixel (OffBit), não a de caligrafia (pedido dela) */
+    /* OffBit monospace font styling */
     font-family: var(--font-subtitle);
     font-size: 1.2rem;
     text-transform: lowercase;
@@ -306,7 +306,7 @@ const styles = `
     .ph {
       height: auto;
       min-height: 100svh;
-      padding: 6rem 1.25rem 3rem;
+      padding: 5.5rem 1.25rem 2.5rem;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
@@ -322,7 +322,7 @@ const styles = `
       font-size: clamp(1.85rem, 8.8vw, 2.75rem);
       line-height: 1.12;
       letter-spacing: -.015em;
-      margin: 1.25rem 0 1rem;
+      margin: 0.75rem 0 0.5rem;
       translate: none;
       text-align: left;
     }
@@ -336,7 +336,7 @@ const styles = `
       top: auto;
       width: 100%;
       max-width: 100%;
-      margin-top: 1rem;
+      margin-top: 0.5rem;
       translate: none;
       font-size: clamp(.85rem, 3.8vw, 1.05rem);
       line-height: 1.45;
@@ -349,10 +349,10 @@ const styles = `
       left: auto !important;
       right: auto !important;
       top: auto !important;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
       text-align: left;
     }
-    .ph__greet { font-size: 1.15rem; }
+    .ph__greet { font-size: 1.1rem; }
     .ph__note { font-size: var(--type-micro); }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -488,10 +488,10 @@ export default function PlaygroundHero({
 
   const canDrag = !isMobile;
 
-  // Elementos funcionais do hero; os desenhos ASCII agora vivem só no background.
+  // Functional hero elements with ASCII backdrop integration
   const stickers: Sticker[] = [
-    // aninhado na concavidade da onda (vazio medido: x45-75% / y19-31% = densidade 0):
-    // aproveita o espaço vazio da gravura em vez de flutuar sobre a parte cheia
+    // Nested dynamically within the canvas negative space
+    // Balances typography within the artwork whitespace
     { key: "clock", left: "58%", top: "12%", rotate: 3, el: <LiveClock /> },
   ];
 
@@ -515,7 +515,7 @@ export default function PlaygroundHero({
         {scrollLabel}
       </span>
 
-      {/* adesivos — arrastáveis dentro do hero */}
+      {/* Interactive draggable stamps and badges */}
       {stickers.map((s, i) => (
         <DraggableSticker
           key={s.key}
@@ -529,12 +529,12 @@ export default function PlaygroundHero({
         />
       ))}
 
-      {/* menu espalhado (ScatterMenu) e afins */}
+      {/* Scatter navigation tags */}
       {children}
 
 
       <h1
-        className="ph__title" 
+        className="ph__title"
         data-compact={lines.join(" ").length > 48 ? "true" : "false"}
         suppressHydrationWarning
       >

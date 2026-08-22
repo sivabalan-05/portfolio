@@ -2,16 +2,16 @@
 
 import { useEffect, useRef } from "react";
 
-// 12fps bastam para a respiração lenta da gravura e mantêm o loop econômico.
+// 12fps frame pacing for smooth ambient wave motion with minimal CPU footprint.
 const FRAME_MS = 1000 / 12;
 
-// Ramp de caracteres delicados (removidos os glifos brutos ░ ▒ ▓ ╳)
+// Curated delicate ASCII glyph ramp for high-contrast wave shaders.
 const SITE_GIBBON_RAMP = [
   "·", "°", "⠂", "⠄", "⠆", "⠒", "⠤", "o", "✳︎", "✦", "✧", "⋆", "♡", "✿", "₊", "˚",
   "≈", "~", "⠶", "⠲", "⠴", "⠛", "⠿",
 ];
 
-const UNIFIED_COLOR = "#173b58"; // Navy azul-escuro único
+const UNIFIED_COLOR = "#173b58"; // Deep navy shade index
 // A última linha visível da gravura está em y=996; os 37 px restantes do
 // arquivo são transparentes. Alinhar por esse limite aproxima a tinta do
 // ticker sem recortar nenhum caractere da obra.

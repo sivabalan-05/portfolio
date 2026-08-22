@@ -19,7 +19,7 @@ const styles = `
   --btn-color: var(--site-ink, #1C1B18);
   --btn-hover-bg: var(--acid, #a3e635);
   --btn-hover-color: #ffffff;
-  --btn-border: var(--acid, #a3e635); /* usa a cor acid dela */
+  --btn-border: var(--acid, #a3e635); /* Brand acid accent color */
   --btn-transition: ease-in-out 0.3s;
   --btn-anim-duration: 1.2s;
   
@@ -51,7 +51,7 @@ const styles = `
 
 .ascii-btn-inner {
   position: relative;
-  /* Herda o background do botão para tampar o texto durante o glitch */
+  /* Matches button background during glitch transition */
   background: transparent;
   display: inline-flex;
   align-items: center;
@@ -75,7 +75,7 @@ const styles = `
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 110%; /* garante que cobre o texto original */
+  width: 110%; /* Ensures complete coverage over original label */
   height: 110%;
   pointer-events: none;
   opacity: 0;
@@ -99,7 +99,7 @@ const styles = `
   70% { content: "⊹·⠂"; }
   80% { content: "⠁✿₊"; }
   90% { content: "˚✳✦"; }
-  100% { content: ""; opacity: 0; } /* some no fim e revela o texto original */
+  100% { content: ""; opacity: 0; } /* Fades out to reveal original label */
 }
 `;
 

@@ -2,12 +2,9 @@
 import { useEffect, useRef } from "react";
 
 /**
- * A palavra gigante do fundo revelada EXATAMENTE como as capas dos projetos:
- * desenhada num canvas e descoberta bloco a bloco conforme o scroll desce,
- * afinando até o traço limpo no fim. (Pedido dela: "faz a animação do
- * 'trabalho' igual as imagens do projeto".)
- *
- * Mesmas constantes do PixelScrollImage pra o ritmo bater.
+ * Giant Background Typography Revealer:
+ * Progressive 2D canvas shader dynamically rendering typography block-by-block
+ * as the user scrolls, transitioning from chunky mosaic to crisp clean lettering.
  */
 
 function thresholdOf(i: number) {
@@ -42,11 +39,11 @@ export default function PixelScrollText({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // fonte real resolvida do token (next/font gera um nome próprio)
+    // Resolve font token from active layout
     const family = getComputedStyle(wrap).fontFamily || "sans-serif";
     const fill = getComputedStyle(wrap).color || color;
 
-    // "molde" com a palavra desenhada uma vez, em resolução de tela
+    // Pre-rendered typography template canvas
     const src = document.createElement("canvas");
     const sctx = src.getContext("2d");
     const off = document.createElement("canvas");
@@ -71,7 +68,7 @@ export default function PixelScrollText({
       sctx.fillStyle = fill;
       sctx.textBaseline = "middle";
       sctx.fillText(text, 0, h / 2);
-      // o wrapper acompanha o tamanho do molde
+      // Canvas wrapper syncs with template aspect ratio
       wrap.style.width = `${w}px`;
       wrap.style.height = `${h}px`;
       canvas.width = src.width;
@@ -141,7 +138,7 @@ export default function PixelScrollText({
     const update = () => { raf = 0; draw(progress()); };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
 
-    // espera a fonte carregar, senão o molde sai na fonte de fallback
+    // Await document font loading for accurate rendering
     const start = () => { buildSource(); update(); };
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(start);
     else start();

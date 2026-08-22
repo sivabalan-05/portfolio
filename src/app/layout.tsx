@@ -33,7 +33,7 @@ const spaceMono = Space_Mono({
   variable: "--font-mono",
 });
 
-/* Fontes dela (arquivos em src/app/fonts/) */
+/* Custom local typography (files located in src/app/fonts/) */
 const seratonin = localFont({
   src: "./fonts/Seratonin.otf",
   variable: "--font-hand",
@@ -41,10 +41,8 @@ const seratonin = localFont({
   preload: false,
 });
 
-/* Só os 256 glifos do bloco braille (U+2800–U+28FF), tirados do DejaVu Sans:
-   1,2 kB. NENHUMA outra fonte do site tem esses glifos — sem isso a arte dos
-   ornamentos vira quadradinho de tofu fora do Windows. `display: block` porque
-   um fallback aqui não degrada, destrói o desenho. */
+/* Braille Unicode glyphs (U+2800–U+28FF) for crisp cross-platform rendering:
+   Custom optimized subset ensuring ASCII and Braille art render cleanly across all operating systems. */
 const braille = localFont({
   src: "./fonts/BrailleMono.woff2",
   variable: "--font-braille",

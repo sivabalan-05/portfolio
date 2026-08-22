@@ -6,17 +6,15 @@ import { useCreativeStudio } from "./CreativeStudio";
 import cupidosBraille from "../../public/img/cupidos-braille-transparent.webp";
 
 /**
- * Rodapé da landing na identidade nova (escuro + lime + linhas pixeladas).
- * Redes sociais como linhas GIGANTES estilo índice — pedido dela: destacar.
- * O GiantFooter antigo segue nas outras páginas até o reset propagar.
+ * Editorial Landing Footer:
+ * Monumental typography index with social links, ASCII engravings, and contact triggers.
  */
 const styles = `
   .ef {
     padding: 0 3.8rem 2rem;
     color: var(--ink);
   }
-  /* O Primeiro Beijo (Bouguereau) preside a divisória antes do rodapé:
-     a obra centralizada, pousada sobre a linha pixelada. */
+  /* Classical artwork centerpiece resting above the editorial divider */
   .ef__divisa {
     position: relative;
     display: flex;
@@ -27,9 +25,7 @@ const styles = `
   .ef__obra {
     position: relative;
     width: min(88%, 44rem);
-    /* caixa mais baixa que a razão real da imagem (1441/1091): com object cover
-       + ancoragem no topo, os ~10% esmaecidos da base são aparados, então o
-       divisor encosta rente ao corpo dos cupidos em vez de flutuar longe. */
+    /* Proportional aspect ratio anchored to top for balanced divider alignment */
     aspect-ratio: 1441 / 985;
     max-width: 100%;
     overflow: hidden;
@@ -40,8 +36,7 @@ const styles = `
     object-fit: cover;
     object-position: top;
   }
-  /* fio fino duplo, como regra de frontispício — o bloco pixelado brigava
-     com a delicadeza da voluta que está encostada nele */
+  /* Delicate double hairline divider */
   .ef__linha {
     width: 100%;
     border-top: 1px solid var(--ink);

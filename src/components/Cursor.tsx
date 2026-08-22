@@ -30,7 +30,7 @@ const INKS = [
   { color: "#f6f1e6", glow: "rgba(255,255,255,.34)" },
   { color: "#ffffff", glow: "rgba(255,255,255,.40)" },
 ] as const;
-/* só as fofinhas — saíram as matemáticas (∑ √ π ≠ ∞ ×) que pareciam terminal */
+/* Editorial glyph sparkle trail */
 const SYMBOLS = ["✦", "✧", "⋆", "✳", "·", "°", "♡", "⊹", "+"];
 const MOTION_FAST = 0.2;
 const MOTION_EASE_STANDARD = [0, 0, 0.2, 1] as const;

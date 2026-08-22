@@ -4,10 +4,8 @@ import { useReducedMotion } from "framer-motion";
 import { GATO_FRAMES } from "./asciiArt";
 
 /**
- * Momento de entrada (pedido dela): um ASCII (a gata dela) + barrinha de loading
- * lime que enche, ~1s, e some revelando o hero. Aparece UMA vez por sessão da aba
- * (sessionStorage), então navegar/voltar não repete. Respeita reduced-motion.
- * Frames trocados por setInterval (roda mesmo em aba oculta).
+ * Initial boot sequence: Animated ASCII feline companion with stepped progress bar.
+ * Appears once per tab session via sessionStorage and respects prefers-reduced-motion.
  */
 const styles = `
   .boot {

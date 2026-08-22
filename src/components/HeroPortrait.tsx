@@ -3,17 +3,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
-interface BarbianaPortraitProps {
+interface HeroPortraitProps {
   src?: string;
   className?: string;
   style?: React.CSSProperties;
 }
 
-export default function BarbianaPortrait({
+export default function HeroPortrait({
   src = "/img/IMG_6379.png",
   className = "",
   style,
-}: BarbianaPortraitProps) {
+}: HeroPortraitProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const processedImgCanvas = useRef<HTMLCanvasElement | null>(null);
@@ -21,7 +21,7 @@ export default function BarbianaPortrait({
   const [isHovered, setIsHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
-  // Mouse velocity tracking for mosaic effect
+  // Mouse velocity tracking for interactive mosaic effect
   const mouseVelocity = useRef(0);
   const lastMousePos = useRef({ x: 0, y: 0, time: 0 });
   const blockFactor = useRef(1);
@@ -46,7 +46,7 @@ export default function BarbianaPortrait({
       const imgData = ctx.getImageData(0, 0, offscreen.width, offscreen.height);
       const data = imgData.data;
 
-      // Flood fill or key out near-white background pixels
+      // Key out near-white background pixels for seamless blend
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
         const g = data[i + 1];
@@ -71,7 +71,7 @@ export default function BarbianaPortrait({
     };
   }, [src]);
 
-  // Main Canvas Render Loop (Fixed, Clean Cutout + Barbiana Mosaic Glitch)
+  // Main Canvas Render Loop (Clean Cutout + Interactive Mosaic Dynamics)
   useEffect(() => {
     if (!isLoaded || !canvasRef.current || !containerRef.current || !processedImgCanvas.current) return;
 
@@ -155,7 +155,7 @@ export default function BarbianaPortrait({
   return (
     <div
       ref={containerRef}
-      className={`barbiana-cutout ${className}`}
+      className={`hero-portrait-cutout ${className}`}
       onPointerMove={handlePointerMove}
       onPointerEnter={() => setIsHovered(true)}
       onPointerLeave={() => {
@@ -168,7 +168,7 @@ export default function BarbianaPortrait({
       }}
     >
       <style>{`
-        .barbiana-cutout {
+        .hero-portrait-cutout {
           position: absolute;
           z-index: 10;
           pointer-events: auto;
@@ -178,7 +178,7 @@ export default function BarbianaPortrait({
           transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .barbiana-cutout canvas {
+        .hero-portrait-cutout canvas {
           width: 100%;
           height: 100%;
           display: block;
@@ -188,14 +188,14 @@ export default function BarbianaPortrait({
         }
 
         @media (max-width: 860px) {
-          .barbiana-cutout {
+          .hero-portrait-cutout {
             position: relative;
-            margin: 1.5rem auto 1rem;
+            margin: 0.75rem auto 0.5rem;
             left: auto !important;
             right: auto !important;
             top: auto !important;
             bottom: auto !important;
-            width: min(65vw, 240px);
+            width: min(56vw, 210px);
             aspect-ratio: 1 / 1.45;
             display: block;
           }

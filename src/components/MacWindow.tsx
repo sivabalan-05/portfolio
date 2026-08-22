@@ -1,9 +1,8 @@
 "use client";
 
 /**
- * Janelinha estilo Mac (ideia dela, da referência Barbiana) para exibir
- * conteúdos de social media: barra com as três bolinhas + nome de arquivo
- * em mono, corpo escuro, canto pixelado da nossa identidade.
+ * Retro-editorial window frame component:
+ * Terminal title bar with classic controls, monospace metadata, dark canvas body, and pixel-stepped edges.
  */
 import { PIXEL_CLIP } from "./PlaygroundHero";
 

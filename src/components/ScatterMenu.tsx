@@ -5,17 +5,15 @@ import HeroButton from "./HeroButton";
 import { useCreativeStudio } from "./CreativeStudio";
 
 /**
- * Menu criativo (referência: os rótulos soltos do barbianaliu.com, na NOSSA
- * linguagem): etiquetas lime de canto pixelado espalhadas pelo hero, cada uma
- * balançando no próprio ritmo. Surpresa: ao rolar além do hero, o menu se
- * "descola" e vira um molhinho fixo no canto, acompanhando a visita.
- * Sem barra de navegação tradicional.
+ * Scatter Navigation Menu:
+ * Interactive tags scattered dynamically across the hero with physics and parallax.
+ * Transitions seamlessly into a fixed corner cluster upon scrolling past the hero.
  */
 
 export type MenuItem = {
   label: string;
-  href: string;        // "#ancora" ou "/rota"
-  left: string;        // posição no hero
+  href: string;        // "#anchor" or "/route"
+  left: string;        // Layout position inside hero
   top: string;
   rotate: number;
   priority: "primary" | "secondary" | "tertiary";
@@ -131,7 +129,7 @@ const styles = `
   .sm__cluster {
     position: fixed;
     right: 1.2rem;
-    /* acima do botão flutuante de voltar ao topo, que ficava por cima */
+    /* Layered above floating back-to-top button */
     bottom: 5.5rem;
     z-index: 900;
     display: flex;
@@ -168,70 +166,70 @@ const styles = `
       3px 3px 0 color-mix(in srgb, var(--ink) 14%, transparent);
   }
   .sm__cluster .sm__portal { display: none; }
-  @media (max-width: 720px) {
-    .sm__tag { font-size: var(--type-label); padding: .55rem .7rem; }
-    /* em tela estreita o molhinho vertical tapava as legendas dos projetos:
-       vira uma fita horizontal no rodapé, à esquerda do botão de topo */
+  @media (max-width: 768px) {
+    .sm__hero-group {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1.25rem 0 0.5rem;
+      z-index: 25;
+      width: 100%;
+    }
+    .sm__tag-wrapper.sm__tag--hero {
+      position: relative !important;
+      left: auto !important;
+      top: auto !important;
+      right: auto !important;
+      bottom: auto !important;
+      transform: none !important;
+      translate: none !important;
+      display: inline-flex !important;
+      visibility: visible !important;
+      animation: none !important;
+      margin: 0 !important;
+    }
+    .sm__tag {
+      font-size: var(--type-micro);
+      padding: .48rem .65rem;
+    }
+    .sm__label {
+      white-space: nowrap;
+      font-size: 0.86rem;
+    }
+    .sm__portal {
+      display: none !important;
+    }
+    /* Fixed bottom dock cluster when scrolling */
     .sm__cluster {
       flex-direction: row;
       align-items: center;
-      /* Uma faixa acima dos dois botões fixos do rodapé (o redondo à esquerda
-         e o "topo" à direita), usando a largura inteira: assim os três links
-         cabem sem scroll e sem cair em cima da legenda dos trabalhos, que era
-         o problema que este bloco queria resolver. */
-      left: .5rem;
-      right: .5rem;
-      bottom: 4.4rem;
-      gap: .28rem;
-      /* uma linha só: quebrando em duas ele tapava a legenda dos projetos */
+      position: fixed;
+      left: 50%;
+      translate: -50% 0;
+      bottom: max(1.2rem, env(safe-area-inset-bottom));
+      gap: .35rem;
       flex-wrap: nowrap;
       justify-content: center;
       overflow-x: auto;
       scrollbar-width: none;
-      /* a fita rola: a máscara sinaliza "tem mais para o lado" em vez de
-         cortar a última etiqueta no meio da palavra */
-      -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.6rem), transparent);
-      mask-image: linear-gradient(to right, #000 calc(100% - 1.6rem), transparent);
-      padding-right: 1.6rem;
+      background: color-mix(in srgb, var(--paper, #ede7da) 88%, #000 12%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+      border-radius: 99px;
+      padding: 0.35rem 0.6rem;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+      z-index: 95;
+      max-width: calc(100vw - 1.5rem);
     }
     .sm__cluster::-webkit-scrollbar { display: none; }
     .sm__cluster .sm__tag {
       flex: 0 0 auto;
       font-size: var(--type-micro);
-      padding: .52rem .62rem;
-      letter-spacing: .04em;
+      padding: .42rem .55rem;
+      letter-spacing: .03em;
     }
-    /* No mobile, a navegação é uma trilha visual estável abaixo do título.
-       O !important também evita que o estado inicial do Motion a deixe invisível
-       em navegadores que suspendem animações durante a primeira pintura. */
-    .sm__tag--hero {
-      display: inline-block !important;
-      visibility: visible !important;
-      animation: none !important;
-    }
-    /* Sem nowrap as etiquetas quebravam em três linhas ("[ ver / projetos / ]")
-       e ainda assim vazavam pela direita da tela. Com uma linha só, as
-       posições abaixo mantêm a etiqueta inteira dentro da viewport. */
-    /* O elemento renderizado é .sm__label (.sm__tag não existe no HTML), e sem
-       nowrap toda etiqueta quebrava em três linhas — no hero e na fita. */
-    .sm__label { white-space: nowrap; }
-    .sm__tag--hero[data-priority="primary"] {
-      left: 44% !important; top: 64% !important;
-      opacity: 1 !important; transform: rotate(2deg) !important;
-      font-size: .92rem;
-    }
-    .sm__tag--hero[data-priority="secondary"] {
-      left: 7% !important; top: 76% !important;
-      opacity: .95 !important; transform: rotate(-2deg) !important;
-      font-size: .88rem;
-    }
-    .sm__tag--hero[data-priority="tertiary"] {
-      left: 44% !important; top: 81% !important;
-      opacity: .88 !important; transform: rotate(1deg) !important;
-      font-size: .84rem;
-    }
-    .sm__cluster .sm__tag[data-priority="primary"]::after { content: ""; }
-    .sm__portal { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .sm__tag { transition: none; }
@@ -244,7 +242,7 @@ function go(e: React.MouseEvent<HTMLElement>, href: string) {
     if (href === "#about") window.dispatchEvent(new Event("studio:reveal-about"));
     document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
   }
-  // rotas ("/experiments") seguem o fluxo normal (transição do Curtains)
+  // Direct route navigation transition
 }
 
 function DraggableHeroTag({
@@ -295,9 +293,7 @@ function DraggableHeroTag({
     <div
       ref={elementRef}
       className="sm__tag-wrapper sm__tag--hero"
-      /* Sem este atributo as regras .sm__tag--hero[data-priority=…] do bloco
-         @media (max-width: 720px) não casavam com nada: no celular as
-         etiquetas ficavam nas coordenadas de desktop e vazavam pela direita. */
+      /* Viewport layout priority rules */
       data-priority={item.priority}
       data-pinned={pinned ? "true" : "false"}
       data-dragging="false"
@@ -336,10 +332,7 @@ function DraggableHeroTag({
         const deltaY = event.clientY - drag.startY;
         if (!drag.moved && Math.hypot(deltaX, deltaY) < 4) return;
         if (!drag.moved) {
-          /* A captura so entra depois que o arrasto passa do limiar. Se ela
-             fosse ligada ja no pointerdown, o pointerup e o click seriam
-             redirecionados para este wrapper e a ancora dentro dele nunca
-             receberia o clique - os botoes do hero paravam de navegar. */
+          /* Pointer gesture capture threshold prevents blocking genuine click events */
           drag.moved = true;
           element.dataset.dragging = "true";
           element.setPointerCapture(event.pointerId);
@@ -394,7 +387,7 @@ export default function ScatterMenu({ items }: { items: MenuItem[] }) {
   const [pinned, setPinned] = useState(false);
   const [footerVisible, setFooterVisible] = useState(false);
 
-  // além do hero (~1 tela), o menu vira molhinho fixo no canto
+  // Fixed cluster mode activated once scrolled beyond the hero
   useEffect(() => {
     const onScroll = () => setPinned(window.scrollY > window.innerHeight * 0.85);
     onScroll();
@@ -417,17 +410,19 @@ export default function ScatterMenu({ items }: { items: MenuItem[] }) {
     <nav aria-label="menu">
       <style>{styles}</style>
 
-      {/* etiquetas espalhadas no hero */}
-      {items.map((it, i) => (
-        <DraggableHeroTag
-          key={it.label}
-          item={it}
-          index={i}
-          pinned={pinned}
-        />
-      ))}
+      {/* Scattered hero tags */}
+      <div className="sm__hero-group">
+        {items.map((it, i) => (
+          <DraggableHeroTag
+            key={it.label}
+            item={it}
+            index={i}
+            pinned={pinned}
+          />
+        ))}
+      </div>
 
-      {/* molhinho fixo no canto depois que o hero sai de cena */}
+      {/* Corner dock cluster once hero is out of view */}
       {pinned && !footerVisible && (
           <div
             className="sm__cluster"

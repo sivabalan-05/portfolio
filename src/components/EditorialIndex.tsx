@@ -20,7 +20,7 @@ export type IndexItem = {
   tagline?: string;
 };
 
-// Tamanho da imagem que segue o cursor (usado também para centralizá-la no ponteiro).
+// Size of floating preview following the pointer
 const PREVIEW_W = 300;
 const PREVIEW_H = 380;
 
@@ -31,7 +31,7 @@ const styles = `
     align-items: baseline;
     gap: 1.5rem;
     padding: 1.6rem 0;
-    /* separador "pixelado": blocos de 6px em vez de fio contínuo */
+    /* Stepped pixel rule separator */
     background-image: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 12px);
     background-size: 100% 2px;
     background-position: top left;
@@ -80,7 +80,7 @@ export default function EditorialIndex({ items }: { items: IndexItem[] }) {
   const sx = useSpring(mx, { stiffness: 260, damping: 32, mass: 0.6 });
   const sy = useSpring(my, { stiffness: 260, damping: 32, mass: 0.6 });
 
-  // A imagem inclina de acordo com a velocidade horizontal — dá peso ao movimento.
+  // Preview tilts dynamically based on cursor velocity for natural momentum
   const vx = useVelocity(sx);
   const rotate = useTransform(vx, [-1400, 0, 1400], [-13, 0, 13], { clamp: true });
 
@@ -101,7 +101,7 @@ export default function EditorialIndex({ items }: { items: IndexItem[] }) {
             className="ei-row hover-trigger"
             data-cursor-label={item.title}
             onMouseEnter={(e) => {
-              // Posiciona a imagem já sob o cursor antes de aparecer, evitando o "voo" inicial.
+              // Pre-positions image under cursor to eliminate initial reposition jump
               mx.jump(e.clientX - PREVIEW_W / 2);
               my.jump(e.clientY - PREVIEW_H / 2);
               setActive(i);
@@ -140,7 +140,7 @@ export default function EditorialIndex({ items }: { items: IndexItem[] }) {
               transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
               style={{ width: "100%", height: "100%", clipPath: PIXEL_CLIP }}
             >
-              {/* câmera de vigilância detectando o projeto — conexão com o TCC dela */}
+              {/* Cyber-vision detection overlay */}
               <SpyImage
                 src={items[active].img}
                 tag={items[active].href.split("/").pop() ?? "projeto"}

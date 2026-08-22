@@ -11,15 +11,15 @@ import { useEffect, useRef } from "react";
  * retorna exatamente ao estágio do mosaico determinado pelo scroll.
  */
 
-// hash determinístico: mesmo bloco sempre com o mesmo limiar (não pisca a cada render)
+// Deterministic hash: ensures identical block threshold across renders
 function thresholdOf(i: number) {
   const x = Math.sin(i * 12.9898) * 43758.5453;
   return x - Math.floor(x);
 }
 
-const COLS = 22;         // resolução da grade de descoberta (blocos na largura)
+const COLS = 22;         // Grid resolution: column block count across width
 const SHARP_COLS = 160;  // a partir daqui já vale desenhar a imagem real
-const REVEAL_END = 0.72; // até aqui os blocos aparecem; depois o mosaico afina
+const REVEAL_END = 0.72; // Reveal phase transition threshold
 
 export default function PixelScrollImage({
   src,
@@ -77,7 +77,7 @@ export default function PixelScrollImage({
 
     const draw = (p: number, hover: number) => {
       if (!ready || !canvas.width || !offCtx) return;
-      // quantiza pra não redesenhar à toa
+      // Quantize to avoid redundant redraws
       const key = `${Math.round(p * 40)}|${Math.round(hover * 10)}`;
       if (key === lastKey) return;
       lastKey = key;
@@ -89,7 +89,7 @@ export default function PixelScrollImage({
       const rows = Math.max(1, Math.round(cols * aspect));
 
       // a moldura já tem a proporção EXATA do arquivo (definida no load), então
-      // desenhamos a imagem inteira: nada de recorte, nada de esticar.
+      // Render source image maintaining native aspect ratio
       const sx = 0;
       const sy = 0;
       const sw = img.naturalWidth;
@@ -105,7 +105,7 @@ export default function PixelScrollImage({
       // `coarse` = QUANTOS blocos cabem na largura. Mais blocos = mais nítido.
       // Descoberta: fica em COLS. Depois vai subindo até resolver na imagem real.
       const coarseBase = revealP < 1 ? cols : cols + (SHARP_COLS - cols) * sharpP;
-      // hover completa os blocos ausentes e afina o mosaico até a foto real
+      // Hover state reveals complete image and sharpens mosaic
       const coarse = Math.round(coarseBase + (SHARP_COLS - coarseBase) * hoverP);
 
       if (visibleP >= 0.995 && coarse >= SHARP_COLS * 0.9) {
@@ -223,7 +223,7 @@ export default function PixelScrollImage({
     ro.observe(wrap);
 
     // Evita redimensionar e redesenhar todos os canvases da mesa a cada scroll.
-    // Só a capa visível (e as imediatamente próximas) ocupa CPU/GPU.
+    // Viewport culling optimization for peak rendering performance
     const visibilityObserver = new IntersectionObserver(
       ([entry]) => {
         isNearViewport = entry.isIntersecting;

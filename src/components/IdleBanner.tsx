@@ -10,10 +10,9 @@ import {
 } from "./asciiArt";
 
 /**
- * Banner ASCII grande e discreto no header (pedido dela). LEVE de propósito:
- * NÃO roda loop de animação — só troca de cena quando o mouse PAUSA (idle),
- * e a troca é um scramble curtinho (setInterval que morre em ~0.3s). Fora isso
- * fica parado. É texto, não canvas. Fundo faint, atrás do conteúdo do hero.
+ * ASCII Header Ambient Banner:
+ * Lightweight display with zero background animation loop overhead.
+ * Gently cycles ambient ASCII scenes upon user idle using a brief text scramble.
  */
 const SCRAMBLE = "░▒▓$#*+=~:.";
 const HOVER_GLYPHS = ["♡", "✦", "✧", "⋆", "░", "▒", "▓", "≈", "°", "⊹", "·", "✿", "₊", "˚", "✳"];
@@ -133,7 +132,7 @@ export default function IdleBanner() {
   const idleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const scrambleTimer = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
-  // troca de cena SÓ quando o mouse para por um tempinho
+  // Trigger scene change when pointer becomes idle
   useEffect(() => {
     if (reduceMotion) return;
     function arm() {
@@ -151,7 +150,7 @@ export default function IdleBanner() {
     };
   }, [reduceMotion]);
 
-  // transição: scramble curto que resolve na cena nova
+  // Brief text scramble transition to next scene
   useEffect(() => {
     const target = ASCII_SCENES[scene % ASCII_SCENES.length];
     if (reduceMotion) {

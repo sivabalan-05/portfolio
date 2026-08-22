@@ -7,7 +7,7 @@ const ALPHA_STEPS = 4;
 
 // Índices 0-3 = as quatro orientações (na ordem do eixo Y do canvas, pra baixo:
 // 45° aponta pra baixo-direita = "\"). 4 = a cruz das cristas.
-// 5+ = poeira Braille, a assinatura do site nos vales da onda.
+// Braille Unicode glyph sequence for ambient particle fields.
 const GLYPHS = ["-", "\\", "|", "/", "+", "⠂", "⠄", "⠆", "⠒", "⠤", "·"];
 const CROSS = 4;
 const DUST = [5, 6, 7, 8, 9, 10];
@@ -38,27 +38,17 @@ function noise(x: number, y: number, seed: number) {
 }
 
 /**
- * Onda de caracteres — canvas puro, nem a lib Motion nem nada de fora.
+ * Canvas 2D ASCII & Braille Particle Wave Field.
  *
- * A ESTRUTURA é uma onda: uma crista atravessa o campo da direita pra esquerda,
- * encurvada por um seno na vertical, e cada linha avança no seu próprio ritmo
- * (senão o campo inteiro desliza rígido, que lê como papel de parede rolando).
- * O caractere de cada célula troca quando a frente passa por cima dela.
+ * Structure: A sinusoidal wave traveling horizontally through the field,
+ * where each line advances with subtle variance for organic depth.
+ * Cell characters shift dynamically as the wave crest passes.
  *
- * O CUSTO é baixo por três decisões:
- *  1. Redesenho SÓ DAS CÉLULAS QUE MUDARAM. Guardo o índice glifo+opacidade de
- *     cada célula; se não mudou, não há clearRect nem drawImage. Numa onda lenta
- *     isso é ~10% das células por quadro, não 100%.
- *  2. Os glifos vivem num atlas pré-renderizado com a opacidade assada no
- *     sprite — nada de fillText no laço, nenhuma troca de estado do contexto.
- *  3. 15fps e só 4 níveis de opacidade: quanto menos degrau, menos célula
- *     entra na conta do que mudou.
- *
- * Sem interação de cursor de propósito (pedido dela): fora o custo, ela obrigava
- * o campo a se redesenhar a cada movimento do mouse.
- *
- * A cor e a fonte vêm do CSS (`color` do canvas), então os temas de papel
- * (.rm[data-paper=...]) continuam mandando na tinta sem tocar no JS.
+ * Performance architecture:
+ * 1. Selective redraw: Only re-renders cells whose glyph/opacity indices change (~10% per frame).
+ * 2. Pre-baked opacity atlas: Glyphs are blitted from an offscreen atlas canvas, eliminating per-frame fillText calls.
+ * 3. 15fps refresh rate & 4 discrete opacity levels for minimal CPU utilization.
+ * 4. Theme adaptive: Canvas color responds directly to active CSS variables without JS overhead.
  */
 export default function AsciiField({
   cell = 20,

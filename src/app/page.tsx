@@ -14,7 +14,7 @@ import {
   useCreativeStudio,
 } from "@/components/CreativeStudio";
 import SkillConstellation from "@/components/SkillConstellation";
-import BarbianaPortrait from "@/components/BarbianaPortrait";
+import HeroPortrait from "@/components/HeroPortrait";
 import {
   personalInfo,
   marqueeSkills,
@@ -332,14 +332,44 @@ const rmStyles = `
     line-height: 1.48;
     opacity: 0.8;
   }
+  .rm-mobile-only {
+    display: none;
+  }
+  .rm-desktop-only {
+    display: inline-block;
+  }
 
   @media (max-width: 900px) {
     .rm-about { grid-template-columns: 1fr; gap: 2.5rem; }
     .rm-exp-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .rm-mobile-only {
+      display: block;
+    }
+    .rm-desktop-only {
+      display: none !important;
+    }
+    .rm-mobile-header {
+      margin-top: 3.5rem;
+      margin-bottom: 1.5rem;
+    }
   }
-  @media (max-width: 720px) {
-    .rm-sec { padding: 4rem 1.25rem; }
-    .rm-label { margin-bottom: 2rem; }
+  @media (max-width: 768px) {
+    .rm-sec { padding: 3.5rem 1.25rem 5rem; }
+    .rm-label { margin-bottom: 1.5rem; }
+    .rm-divider { margin-bottom: 2rem; }
+    .rm-statement {
+      font-size: clamp(1.4rem, 5.2vw, 2.2rem);
+      line-height: 1.2;
+      max-width: 100%;
+    }
+    .rm-about-para {
+      font-size: 0.98rem;
+      line-height: 1.6;
+      max-width: 100%;
+    }
+    .rm-timeline-item {
+      padding-left: 1.25rem;
+    }
   }
 `;
 
@@ -438,7 +468,7 @@ function HomeContent() {
           scrollLabel="scroll to explore ↓"
         >
           <AdaptiveKanagawa className="rm-field" opacity={0.3} />
-          <BarbianaPortrait
+          <HeroPortrait
             src="/img/IMG_6379.png"
             style={{ right: "8%", bottom: "0px" }}
           />
@@ -478,7 +508,7 @@ function HomeContent() {
           <span className="rm-guide" aria-hidden="true" style={{ right: "7%", top: "4.5rem", animationDelay: "-3s" }}>✳︎</span>
           <div className="rm-label">
             <span>about me</span>
-            <span>biography & focus</span>
+            <span className="rm-desktop-only">biography & focus</span>
           </div>
           <AsciiDivider className="rm-divider" pattern={STITCH_DIVIDER} fullWidth opacity={0.52} />
           <div className="rm-about">
@@ -502,6 +532,12 @@ function HomeContent() {
               </div>
             </div>
             <div className="rm-tools">
+              <div className="rm-mobile-only rm-mobile-header">
+                <div className="rm-label">
+                  <span>biography & focus</span>
+                </div>
+                <AsciiDivider className="rm-divider" pattern={STITCH_DIVIDER} fullWidth opacity={0.52} />
+              </div>
               <SkillConstellation nodes={constellationSkills} />
               <div style={{ marginTop: "2rem" }}>
                 <AsciiDivider opacity={0.45} />
@@ -550,7 +586,7 @@ function HomeContent() {
         <section id="experience" className="rm-sec" style={{ position: "relative" }}>
           <div className="rm-label">
             <span>background</span>
-            <span>experience & education</span>
+            <span className="rm-desktop-only">experience & education</span>
           </div>
           <AsciiDivider className="rm-divider" pattern={STITCH_DIVIDER} fullWidth opacity={0.52} />
           <div className="rm-exp-grid">
@@ -576,7 +612,13 @@ function HomeContent() {
             </div>
 
             <div>
-              <h3 style={{ fontFamily: "var(--font-body)", fontSize: "1.2rem", fontWeight: 700, textTransform: "lowercase", letterSpacing: "0.04em", marginBottom: "1.5rem" }}>
+              <div className="rm-mobile-only rm-mobile-header">
+                <div className="rm-label">
+                  <span>education</span>
+                </div>
+                <AsciiDivider className="rm-divider" pattern={STITCH_DIVIDER} fullWidth opacity={0.52} />
+              </div>
+              <h3 className="rm-desktop-only" style={{ fontFamily: "var(--font-body)", fontSize: "1.2rem", fontWeight: 700, textTransform: "lowercase", letterSpacing: "0.04em", marginBottom: "1.5rem" }}>
                 education
               </h3>
               <div className="rm-timeline">
