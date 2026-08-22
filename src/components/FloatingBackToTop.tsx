@@ -45,9 +45,13 @@ const styles = `
     background: var(--ink);
     color: var(--paper);
   }
-  .btt:focus-visible {
-    outline: 2px dotted var(--ink);
-    outline-offset: 3px;
+  @media (max-width: 768px) {
+    .btt {
+      bottom: 4.8rem;
+      right: 1rem;
+      padding: .35rem .55rem;
+      font-size: .62rem;
+    }
   }
 `;
 
@@ -83,10 +87,10 @@ export default function FloatingBackToTop() {
         className="btt hover-trigger"
         data-visible={isVisible ? "true" : "false"}
         onClick={scrollToTop}
-        aria-label="Voltar ao topo"
+        aria-label="Back to top"
         tabIndex={isVisible ? 0 : -1}
       >
-        ↑ topo
+        ↑ top
       </button>
     </>
   );

@@ -354,21 +354,81 @@ const rmStyles = `
     }
   }
   @media (max-width: 768px) {
-    .rm-sec { padding: 3.5rem 1.25rem 5rem; }
+    .rm-spine, .rm-thread {
+      display: none !important;
+    }
+    .rm-sec {
+      padding: 3.5rem 1.25rem 5.5rem;
+      width: 100%;
+      max-width: 100vw;
+      box-sizing: border-box;
+    }
     .rm-label { margin-bottom: 1.5rem; }
     .rm-divider { margin-bottom: 2rem; }
-    .rm-statement {
-      font-size: clamp(1.4rem, 5.2vw, 2.2rem);
-      line-height: 1.2;
+    .rm-about {
+      width: 100%;
       max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .rm-about-copy {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+    .rm-statement {
+      font-size: clamp(1.35rem, 5.2vw, 2.1rem);
+      line-height: 1.22;
+      max-width: 100%;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
     .rm-about-para {
-      font-size: 0.98rem;
-      line-height: 1.6;
+      font-size: 0.95rem;
+      line-height: 1.62;
+      max-width: 100%;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+    .rm-about-highlights {
+      width: 100%;
+      max-width: 100%;
+    }
+    .rm-about-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 100%;
+    }
+    .rm-about-item span:last-child {
+      flex: 1;
+      min-width: 0;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+    .rm-exp-grid {
+      width: 100%;
+      max-width: 100%;
+    }
+    .rm-timeline {
+      width: 100%;
       max-width: 100%;
     }
     .rm-timeline-item {
       padding-left: 1.25rem;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+    .rm-timeline-desc,
+    .rm-timeline-bullets {
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
   }
 `;
