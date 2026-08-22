@@ -47,8 +47,8 @@ const styles = `
   }
   @media (max-width: 768px) {
     .btt {
-      bottom: 4.8rem;
-      right: 1rem;
+      bottom: 1.2rem;
+      right: 0.85rem;
       padding: .35rem .55rem;
       font-size: .62rem;
     }
