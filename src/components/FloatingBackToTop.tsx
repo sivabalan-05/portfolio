@@ -47,10 +47,11 @@ const styles = `
   }
   @media (max-width: 768px) {
     .btt {
-      bottom: 1.2rem;
+      bottom: 4.6rem;
       right: 0.85rem;
       padding: .35rem .55rem;
       font-size: .62rem;
+      z-index: 920;
     }
   }
 `;

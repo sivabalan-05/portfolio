@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import LangToggle from "./LangToggle";
 import ScrambleText from "./ScrambleText";
 import UnderlineButton from "./UnderlineButton";
-import { useT } from "@/i18n/LanguageContext";
 import { usePathname } from "next/navigation";
+import { personalInfo } from "@/data/portfolioData";
+import { useCreativeStudio } from "./CreativeStudio";
+import { useState, useEffect } from "react";
 
 const styles = `
   .sh {
@@ -15,7 +16,7 @@ const styles = `
     color: var(--site-ink, #1C1B18);
     pointer-events: auto;
   }
-  .sh--l { left: clamp(1.5rem, 5vw, 5.5rem); display: flex; flex-direction: column; gap: .12rem; line-height: 1.1; }
+  .sh--l { left: clamp(1.5rem, 5vw, 5.5rem); display: flex; align-items: center; gap: .8rem; line-height: 1.1; }
   .sh__mark {
     font-family: var(--font-pixelscript, cursive);
     font-weight: 400; font-size: 2.3rem; letter-spacing: 0;
@@ -67,7 +68,7 @@ const styles = `
   .sh__dot {
     position: relative;
     width: 7px; height: 7px; border-radius: 50%;
-    background: var(--selection-bg, #843f3a);
+    background: #238636;
   }
   .sh__dot::after {
     content: "";
@@ -97,44 +98,220 @@ const styles = `
   }
   .sh__nav { display: inline-flex; align-items: center; gap: .7rem; }
   .sh__nav a { font-size: var(--type-micro); letter-spacing: .04em; }
+
+  .sh__mobile-actions { display: none; }
+  .sh__cv-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: .28rem .58rem;
+    border-radius: 4px;
+    font-family: var(--font-mono), monospace;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    background: color-mix(in srgb, var(--site-ink, #1C1B18) 92%, transparent);
+    color: var(--site-paper, #ede7da);
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,.15);
+    transition: transform .15s ease, background-color .15s ease;
+  }
+  .sh__cv-btn:active { transform: scale(.94); }
+
+  .sh__mobile-status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: .25rem .55rem;
+    border: 1px solid color-mix(in srgb, var(--site-ink, #1C1B18) 18%, transparent);
+    border-radius: 99px;
+    font-family: var(--font-mono), monospace;
+    font-size: .64rem;
+    background: color-mix(in srgb, var(--site-paper, #ede7da) 88%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    white-space: nowrap;
+  }
+  .sh__mobile-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #238636;
+    box-shadow: 0 0 5px #238636;
+  }
+  .sh__mobile-dock { display: none; }
+
+  @media (max-width: 860px) {
+    .sh {
+      top: 1rem;
+      width: 100%;
+      left: 0 !important;
+      right: 0 !important;
+      padding: 0 1rem;
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+    .sh--l {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 100%;
+      pointer-events: auto;
+    }
+    .sh--r { display: none; }
+    
+    .sh__mark {
+      font-size: clamp(1.15rem, 5.2vw, 1.45rem);
+      line-height: .98;
+      padding: .22rem .45rem;
+      background: color-mix(in srgb, var(--site-paper, #ede7da) 88%, transparent);
+      box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--site-paper, #ede7da) 88%, transparent);
+      -webkit-backdrop-filter: blur(5px);
+      backdrop-filter: blur(5px);
+      border-radius: 2px;
+    }
+
+    .sh__mobile-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      pointer-events: auto;
+    }
+
+    .sh__mobile-dock {
+      position: fixed;
+      bottom: 1.1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 950;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: 5px 8px;
+      background: color-mix(in srgb, var(--site-paper, #ede7da) 84%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid color-mix(in srgb, var(--site-ink, #1C1B18) 22%, transparent);
+      border-radius: 99px;
+      box-shadow:
+        0 12px 28px -6px rgba(28, 27, 24, .22),
+        0 2px 8px rgba(28, 27, 24, .08),
+        inset 0 0 0 1px rgba(255, 255, 255, .35);
+      max-width: calc(100vw - 2rem);
+      overflow-x: auto;
+      pointer-events: auto;
+      animation: dock-arrive .5s cubic-bezier(.16, 1, .3, 1) both;
+    }
+
+    @keyframes dock-arrive {
+      from { transform: translate(-50%, 20px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+
+    .sh__dock-item {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: .42rem .68rem;
+      font-family: var(--font-subtitle), monospace;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+      text-transform: lowercase;
+      color: var(--site-ink, #1C1B18);
+      text-decoration: none;
+      border-radius: 99px;
+      white-space: nowrap;
+      transition: background-color .18s ease, transform .12s ease;
+    }
+    .sh__dock-item:active {
+      transform: scale(.92);
+      background: color-mix(in srgb, var(--site-ink, #1C1B18) 12%, transparent);
+    }
+    .sh__dock-item--active {
+      background: var(--site-ink, #1C1B18);
+      color: var(--site-paper, #ede7da);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .sh__dot::after,
     .sh__mark .text-star,
-    .sh__name::after { animation: none; }
-  }
-  @media (max-width: 860px) {
-    .sh__status, .sh__nav { display: none; }
-    .sh--l { max-width: calc(100vw - 8rem); }
-    .sh__mark { font-size: clamp(1.15rem, 5.6vw, 1.55rem); line-height: .98; }
-    /* Em tela estreita o conteúdo passa por baixo do cabeçalho fixo e a
-       assinatura ficava ilegível sobre o texto. O halo de papel é o mesmo
-       idioma já usado em .pj-tag e .lang-toggle — resolve a leitura sem
-       fechar o topo da página com uma barra sólida. */
-    .sh__mark {
-      padding: .2rem .45rem;
-      background: color-mix(in srgb, var(--site-paper, #ede7da) 88%, transparent);
-      box-shadow: 0 0 0 .3rem color-mix(in srgb, var(--site-paper, #ede7da) 88%, transparent);
-      -webkit-backdrop-filter: blur(5px);
-      backdrop-filter: blur(5px);
-    }
+    .sh__name::after,
+    .sh__mobile-dock { animation: none; }
   }
 `;
 
 export default function SiteHeader() {
   const pathname = usePathname();
   const isHome = pathname === "/" || pathname === "";
+  const { playSound } = useCreativeStudio();
+  const [activeSection, setActiveSection] = useState<string>("work");
+
+  useEffect(() => {
+    const sections = ["work", "about", "skills", "experience", "contact"];
+    const handleScroll = () => {
+      const scrollPos = window.scrollY + window.innerHeight * 0.4;
+      for (const id of sections) {
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPos >= top && scrollPos < top + height) {
+            setActiveSection(id);
+            break;
+          }
+        }
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleDockClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    playSound("paper");
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      navigator.vibrate?.(6);
+    }
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <>
       <style>{styles}</style>
-      <span className="sh sh--l">
+      <header className="sh sh--l">
         <Link href="/" className="sh__mark" aria-label="Sivabalan">
           <span className="text-star" aria-hidden="true">✳︎</span>{" "}
           <span className="sh__name">
             <span className="sh__name-word">Sivabalan</span>
           </span>
         </Link>
-      </span>
+
+        <div className="sh__mobile-actions">
+          <span className="sh__mobile-status-chip">
+            <span className="sh__mobile-status-dot" aria-hidden="true" />
+            <span>available</span>
+          </span>
+
+          <a
+            href={personalInfo.resumeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sh__cv-btn"
+            aria-label="CV"
+            onClick={() => playSound("hover")}
+          >
+            <span>CV</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </header>
+
       <span className="sh sh--r">
         <span className="sh__status">
           <span className="sh__dot" aria-hidden="true" />
@@ -158,6 +335,44 @@ export default function SiteHeader() {
           </UnderlineButton>
         </nav>
       </span>
+
+      <nav className="sh__mobile-dock" aria-label="Quick Nav">
+        <a
+          href="#work"
+          className={`sh__dock-item ${activeSection === "work" ? "sh__dock-item--active" : ""}`}
+          onClick={(e) => handleDockClick(e, "work")}
+        >
+          ✳ work
+        </a>
+        <a
+          href="#about"
+          className={`sh__dock-item ${activeSection === "about" ? "sh__dock-item--active" : ""}`}
+          onClick={(e) => handleDockClick(e, "about")}
+        >
+          about
+        </a>
+        <a
+          href="#skills"
+          className={`sh__dock-item ${activeSection === "skills" ? "sh__dock-item--active" : ""}`}
+          onClick={(e) => handleDockClick(e, "skills")}
+        >
+          skills
+        </a>
+        <a
+          href="#experience"
+          className={`sh__dock-item ${activeSection === "experience" ? "sh__dock-item--active" : ""}`}
+          onClick={(e) => handleDockClick(e, "experience")}
+        >
+          exp
+        </a>
+        <a
+          href="#contact"
+          className={`sh__dock-item ${activeSection === "contact" ? "sh__dock-item--active" : ""}`}
+          onClick={(e) => handleDockClick(e, "contact")}
+        >
+          contact
+        </a>
+      </nav>
     </>
   );
 }
