@@ -72,18 +72,6 @@ const rmStyles = `
   .rm .rm-idle {
     color: color-mix(in srgb, var(--ink) 17%, transparent);
   }
-  .rm .rm-thread { opacity: .36; }
-  .rm .ph__sticker { filter: contrast(1.12); }
-  .rm::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 5;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: .07;
-    mix-blend-mode: multiply;
-  }
   .rm *::selection { background: #843f3a; color: #fff8ec; }
   .px-line {
     background-image: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 12px);
@@ -170,15 +158,18 @@ const rmStyles = `
   .rm-sec {
     padding: 6rem 5.5rem;
     scroll-margin-top: 6.5rem;
-    content-visibility: auto;
-    contain-intrinsic-size: auto 900px;
   }
   .rm-label {
-    font-family: var(--font-body);
-    font-size: clamp(1.05rem, .95rem + .55vw, 1.45rem);
-    text-transform: lowercase; letter-spacing: .08em;
-    display: flex; justify-content: space-between;
-    padding-bottom: .55rem; margin-bottom: 0;
+    font-family: var(--font-body), sans-serif;
+    font-size: clamp(0.85rem, 0.8rem + 0.2vw, 1.05rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 0.55rem;
+    margin-bottom: 0;
+    color: var(--ink);
   }
   .rm-divider { margin-bottom: 3rem; }
   .rm-statement {

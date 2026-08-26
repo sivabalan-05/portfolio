@@ -53,8 +53,6 @@ export default function StaticKanagawa({
             width / image.naturalWidth,
             height / (image.naturalHeight * ART_VISIBLE_BOTTOM_RATIO),
           );
-      // A gravura funciona como background cover: preenche a tela, aceita
-      // recorte e mantém a crista como ponto focal sem distorcer a imagem.
       const scale = baseScale * (mobile ? MOBILE_ART_ZOOM : 1.08);
       const drawWidth = image.naturalWidth * scale;
       const drawHeight = image.naturalHeight * scale;

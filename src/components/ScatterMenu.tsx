@@ -410,7 +410,14 @@ export default function ScatterMenu({ items }: { items: MenuItem[] }) {
 
   // Fixed cluster mode activated once scrolled beyond the hero
   useEffect(() => {
-    const onScroll = () => setPinned(window.scrollY > window.innerHeight * 0.85);
+    let last = false;
+    const onScroll = () => {
+      const next = window.scrollY > window.innerHeight * 0.85;
+      if (next !== last) {
+        last = next;
+        setPinned(next);
+      }
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);

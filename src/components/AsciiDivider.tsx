@@ -1,20 +1,7 @@
 "use client";
 
-/**
- * Divisores ASCII no lugar das linhas CSS tracejadas. O padrão estrutural é
- * `------`; ornamentos podem fornecer outros padrões. É texto puro repetido e cortado
- * na largura do container ou da tela inteira (fullWidth) — leve, sem imagem, sem JS.
- *
- * `braille`: usa a BrailleMono (já carregada pros ornamentos) — glifos ⠂⠄⠁
- * renderizam garantido. Os outros padrões (︶ ꒷ ꒦ ◠ ⊹ ˚ ₊) vêm de blocos
- * unicode bem cobertos por Segoe/Noto.
- *
- * `fullWidth`: faz o divisor sangrar de ponta a ponta na tela (100vw),
- * ignorando paddings de containers pai.
- *
- * `repeat={false}`: peça única centralizada (ex.: a carinha ૮₍ ´ ꒳ ` ₎a)
- * em vez de padrão repetido de ponta a ponta.
- */
+import React from "react";
+
 export const DIVIDERS = {
   line: "------  ",
   star: "✦ .  ⁺  . ✦ .  ⁺  . ✦ .  ⁺  . ✦",

@@ -25,24 +25,21 @@
     --ease-default: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     --ease-out: cubic-bezier(0, 0, 0, 1);
-    --site-paper:  #EDE7DA;  /* bege quente, levemente acinzentado */
-    --site-ink:    #1C1B18;  /* cinza bem escuro (não é preto puro) */
-    --site-accent: #1C1B18;  /* agora usa o preto da fonte como destaque, elegante e editorial */
+    --site-paper:  #EDE7DA;
+    --site-ink:    #1C1B18;
+    --site-accent: #1C1B18;
     --site-accent-rgb: 28, 27, 24;
-    /* tintas quentes de fundo */
     --site-tint-a: #F6F1E6;
     --site-tint-b: #E6DCCB;
     --site-tint-c: #F1E7D6;
     --selection-bg: #843f3a;
     --selection-fg: #fff8ec;
-    /* Escala mínima compartilhada: nenhum metadado funcional volta a 8–10px. */
     --type-micro: clamp(.78rem, .74rem + .14vw, .9rem);
     --type-label: clamp(.875rem, .83rem + .18vw, 1rem);
     --type-body: clamp(1rem, .96rem + .18vw, 1.125rem);
     --type-body-lg: clamp(1.08rem, 1rem + .28vw, 1.28rem);
     --type-ascii-rule: clamp(.78rem, .73rem + .18vw, .92rem);
     --tap-min: 44px;
-    /* Medidas editoriais comuns a todos os cases. */
     --project-shell-max: 1440px;
     --project-content-max: 1320px;
     --project-compact-max: 1120px;
@@ -51,17 +48,12 @@
     --measure-section-title: 20ch;
     --measure-project-copy: 76ch;
     --measure-copy: 68ch;
-    /* Matéria tátil comum a fichas, etiquetas e cartões. */
     --paper-sheet: rgba(246, 241, 230, .94);
     --paper-edge: rgba(28, 27, 24, .28);
     --paper-shadow: rgba(28, 27, 24, .13);
     --paper-tape: rgba(231, 216, 185, .72);
 }
 
-
-/* ==========================================
-   RESET & DESIGN TOKENS (Aura Meeko)
-   ========================================== */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
 :root {
@@ -85,8 +77,6 @@
 }
 
 *::selection { background: #843f3a; color: #fff8ec; }
-html { scroll-behavior:smooth; }
-
 body {
     background:var(--surface);
     color:var(--fg);
@@ -548,7 +538,6 @@ img { max-width:100%; display:block; }
     .cap-tag { font-size:.78rem; padding:.5rem 1rem; }
 }
 
-/* Títulos dos cards em /work — escopo separado para não disputar com edições do card. */
 .wk-page h2 {
     font-family: var(--font-editorial), serif !important;
     letter-spacing: -0.02em !important;
@@ -601,34 +590,26 @@ img { max-width:100%; display:block; }
   white-space: nowrap;
 }
 
-/* Ajuste óptico: a caixa tipográfica é igual, mas a área desenhada varia
-   quase 2× entre os glifos desta fonte. */
 .scramble-text__emoji[data-emoji=":3"],
 .scramble-text__emoji[data-emoji=":)"] { font-size: 0.9em; }
 .scramble-text__emoji[data-emoji="^_^"] { font-size: 1em; }
-/* Tamanho aparente igualado ao do rostinho (0.585em), medido pela média
-   geométrica da caixa de tinta — largura × altura. Igualar só a altura fazia
-   os glifos compactos, como a rosa e o bichinho, parecerem menores. */
-.scramble-text__emoji[data-emoji=":D"] {   /* K, rosa */
+.scramble-text__emoji[data-emoji=":D"] {
   font-size: 0.60em;
   vertical-align: 0.14em;
 }
-.scramble-text__emoji[data-emoji=";)"] {   /* W, borboleta */
+.scramble-text__emoji[data-emoji=";)"] {
   font-size: 0.75em;
   vertical-align: 0.01em;
 }
-.scramble-text__emoji[data-emoji=":P"] {   /* q, bichinho */
+.scramble-text__emoji[data-emoji=":P"] {
   font-size: 0.67em;
   vertical-align: 0.10em;
 }
-.scramble-text__emoji[data-emoji="<3"] {   /* C, coração */
+.scramble-text__emoji[data-emoji="<3"] {
   font-size: 0.94em;
   vertical-align: 0.03em;
 }
 
-/* Qualidade adaptativa: mantém cor, foco e feedback, mas remove deslocamentos,
-   loops e filtros caros em hardware/rede limitados. O atributo é definido no
-   <head>, antes da primeira pintura, evitando começar e cancelar animações. */
 html[data-motion="lite"] *,
 html[data-motion="lite"] *::before,
 html[data-motion="lite"] *::after {
@@ -646,7 +627,6 @@ html[data-motion="lite"] .ph__line-inner {
 
 .scramble-text__grid {
   position: fixed;
-  /* Acima do grão global (z-index 950), para a grade não ficar lavada. */
   z-index: 960;
   display: inline-grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

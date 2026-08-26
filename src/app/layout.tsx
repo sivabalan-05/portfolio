@@ -202,9 +202,6 @@ export default function RootLayout({
         <LanguageProvider>
           <DesktopLoreWarning />
           <SmoothScroll>
-            {/* Cursor fica FORA do PageTransitionProvider de propósito: o wrapper de
-                transição aplica transform durante a saída, o que quebraria o
-                position:fixed do canvas. Aqui ele também não some no fade da troca de página. */}
             <AdaptiveCursor />
             <div
               aria-hidden="true"
@@ -216,8 +213,7 @@ export default function RootLayout({
                 pointerEvents: "none",
                 backgroundImage: "url('/img/paper-noise.webp')",
                 backgroundSize: "180px 180px",
-                opacity: 0.065,
-                mixBlendMode: "multiply",
+                opacity: 0.045,
               }}
             />
             <PageTransitionProvider>

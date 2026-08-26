@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import LangToggle from "./LangToggle";
 import ScrambleText from "./ScrambleText";
 import UnderlineButton from "./UnderlineButton";
-import { useT } from "@/i18n/LanguageContext";
 import { usePathname } from "next/navigation";
 
 const styles = `
@@ -105,12 +103,9 @@ const styles = `
   @media (max-width: 860px) {
     .sh__status, .sh__nav { display: none; }
     .sh--l { max-width: calc(100vw - 8rem); }
-    .sh__mark { font-size: clamp(1.15rem, 5.6vw, 1.55rem); line-height: .98; }
-    /* Em tela estreita o conteúdo passa por baixo do cabeçalho fixo e a
-       assinatura ficava ilegível sobre o texto. O halo de papel é o mesmo
-       idioma já usado em .pj-tag e .lang-toggle — resolve a leitura sem
-       fechar o topo da página com uma barra sólida. */
     .sh__mark {
+      font-size: clamp(1.15rem, 5.6vw, 1.55rem);
+      line-height: .98;
       padding: .2rem .45rem;
       background: color-mix(in srgb, var(--site-paper, #ede7da) 88%, transparent);
       box-shadow: 0 0 0 .3rem color-mix(in srgb, var(--site-paper, #ede7da) 88%, transparent);

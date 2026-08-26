@@ -1,12 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 
-/**
- * Botão "voltar ao topo" no estilo editorial do site:
- * sem bolha escura genérica — uma etiqueta sutil com borda fina,
- * fundo da página e a seta ↑ na fonte mono do site.
- */
-
 const styles = `
   .btt {
     position: fixed;
@@ -48,7 +42,7 @@ const styles = `
   @media (max-width: 768px) {
     .btt {
       bottom: 1.2rem;
-      right: 0.85rem;
+      right: .85rem;
       padding: .35rem .55rem;
       font-size: .62rem;
     }

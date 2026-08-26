@@ -258,9 +258,6 @@ export function CreativeStudioProvider({ children }: { children: React.ReactNode
       scale: 0.86 + Math.random() * 0.3,
       opacity: 0.18 + Math.random() * 0.12,
     };
-    setStamps((current) => [...current.slice(-13), stamp]);
-    // 17 e 74 são coprimos: a coleção aparece intercalada, mas todos os
-    // carimbos passam pela mesa antes de a sequência recomeçar.
     setStampIndex((current) => (current + 17) % STAMPS.length);
     playSound("stamp");
   }, [playSound, stampIndex]);
@@ -293,8 +290,6 @@ export function CreativeStudioProvider({ children }: { children: React.ReactNode
   }, [stampMode]);
 
   useEffect(() => {
-    // O HTML já nasce com os tokens de "cream". Reescrevê-los na primeira
-    // hidratação invalida os estilos da página inteira e posterga o LCP.
     if (!paperEffectMounted.current) {
       paperEffectMounted.current = true;
       return;
@@ -505,7 +500,7 @@ export function CreativeStudioControls() {
   return (
     <aside
       className="cs-tools"
-      aria-label="Ateliê interativo"
+      aria-label="Studio controls"
       data-no-stamp
       data-open={open ? "true" : "false"}
     >
@@ -513,9 +508,9 @@ export function CreativeStudioControls() {
       <button
         type="button"
         className="cs-tool cs-tool--drawer hover-trigger"
-        aria-label={open ? "Fechar ferramentas" : "Abrir ferramentas"}
+        aria-label={open ? "Close tools" : "Open tools"}
         aria-expanded={open}
-        data-tip="ferramentas"
+        data-tip="tools"
         onClick={() => setOpen((current) => !current)}
       >
         [ ⁝ ]
@@ -523,8 +518,8 @@ export function CreativeStudioControls() {
       <button
         type="button"
         className="cs-tool hover-trigger"
-        aria-label="Alternar tipo de papel"
-        data-tip="papel"
+        aria-label="Change paper"
+        data-tip="paper"
         onClick={cyclePaper}
       >
         [ {PAPER_GLYPH[paper]} ]
@@ -532,9 +527,9 @@ export function CreativeStudioControls() {
       <button
         type="button"
         className="cs-tool hover-trigger"
-        aria-label="Ativar carimbos"
+        aria-label="Toggle stamps"
         aria-pressed={stampMode}
-        data-tip="carimbar"
+        data-tip="stamp"
         onClick={toggleStampMode}
       >
         [ {stampMode ? "❀" : "✿"} ]
@@ -543,8 +538,8 @@ export function CreativeStudioControls() {
           <button
             type="button"
             className="cs-tool cs-tool--pop hover-trigger"
-            aria-label="Limpar carimbos"
-            data-tip="limpar"
+            aria-label="Clear stamps"
+            data-tip="clear"
             onClick={clearStamps}
           >
             [ ✕ ]
@@ -554,8 +549,8 @@ export function CreativeStudioControls() {
           <button
             type="button"
             className="cs-tool cs-tool--pop hover-trigger"
-            aria-label="Reorganizar os objetos"
-            data-tip="reorganizar"
+            aria-label="Reset layout"
+            data-tip="reset"
             onClick={resetTable}
           >
             [ ↺ ]

@@ -1,53 +1,29 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import ScrambleText from "./ScrambleText";
-import { useT } from "@/i18n/LanguageContext";
 import { StampCanvas, useCreativeStudio } from "./CreativeStudio";
 
-/* 8px stepped pixel clip-path for retro-editorial frames */
 export const PIXEL_CLIP =
   "polygon(0 8px, 8px 8px, 8px 0, calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px))";
 
 type ClockPeriod = "late" | "morning" | "afternoon" | "evening";
 
-const CLOCK_GREETINGS: Record<
-  "pt" | "en",
-  Record<ClockPeriod, readonly string[]>
-> = {
-  pt: {
-    late: [
-      "a luz dormiu acesa",
-      "o computador ainda quente",
-      "só o brilho da tela agora",
-      "o silêncio ficou mais alto",
-      "só o som do ventilador do pc",
-    ],
-    morning: ["bom dia?"],
-    afternoon: [
-      "horário comercial, aparentemente",
-      "produtividade, dizem",
-      "tecnicamente ainda é dia útil",
-      "meio do expediente, moralmente falando",
-    ],
-    evening: ["a luz dormiu acesa"],
-  },
-  en: {
-    late: [
-      "the light fell asleep first",
-      "computer's still warm",
-      "just the screen glow now",
-      "the silence got louder",
-      "just the pc fan humming",
-    ],
-    morning: ["morning, i guess?"],
-    afternoon: [
-      "College hours, apparently",
-      "productivity, allegedly",
-      "technically still a workday",
-      "mid-shift, morally speaking",
-    ],
-    evening: ["the light stayed on"],
-  },
+const CLOCK_GREETINGS: Record<ClockPeriod, readonly string[]> = {
+  late: [
+    "the light fell asleep first",
+    "computer's still warm",
+    "just the screen glow now",
+    "the silence got louder",
+    "just the pc fan humming",
+  ],
+  morning: ["morning, ready to build"],
+  afternoon: [
+    "focus hours, in the zone",
+    "shipping ideas to reality",
+    "crafting code & models",
+    "making things happen",
+  ],
+  evening: ["the work continues"],
 };
 
 function clockPeriodFor(hour: number): ClockPeriod {
@@ -57,9 +33,7 @@ function clockPeriodFor(hour: number): ClockPeriod {
   return "evening";
 }
 
-/** Live clock & contextual greeting component */
 function LiveClock() {
-  const { lang } = useT();
   const [now, setNow] = useState("");
   const [greet, setGreet] = useState("");
   const phraseRef = useRef<{ period: ClockPeriod | ""; index: number }>({
@@ -72,7 +46,7 @@ function LiveClock() {
       const period = clockPeriodFor(hour);
 
       if (phraseRef.current.period !== period) {
-        const phrases = CLOCK_GREETINGS.pt[period];
+        const phrases = CLOCK_GREETINGS[period];
         const indexKey = `portfolio-clock-${period}`;
         const loadKey = `portfolio-clock-load-${period}`;
         const pageLoad = String(performance.timeOrigin);
@@ -96,7 +70,7 @@ function LiveClock() {
 
       const { period: activePeriod, index } = phraseRef.current;
       if (!activePeriod) return "";
-      const phrases = CLOCK_GREETINGS[lang][activePeriod];
+      const phrases = CLOCK_GREETINGS[activePeriod];
       return phrases[index % phrases.length];
     };
 
@@ -104,7 +78,7 @@ function LiveClock() {
       const d = new Date();
       setNow(
         d
-          .toLocaleString(lang === "pt" ? "pt-BR" : "en-US", {
+          .toLocaleString("en-US", {
             weekday: "short",
             hour: "2-digit",
             minute: "2-digit",
@@ -117,7 +91,8 @@ function LiveClock() {
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [lang]);
+  }, []);
+
   return (
     <span className="ph__clock" suppressHydrationWarning>
       <span className="ph__greet">{greet || "…"}</span>
@@ -131,9 +106,8 @@ function LiveClock() {
 const styles = `
   .ph {
     position: relative;
-    background: transparent; /* Transparent background to allow grain & gradient blend */
+    background: transparent;
     color: var(--ink);
-    /* Exact 100svh viewport framing */
     height: 100svh;
     min-height: 100svh;
     display: flex;
@@ -155,13 +129,10 @@ const styles = `
     z-index: 1;
   }
   .ph__title {
-    /* PF Pixelscript hero headline with responsive scaling */
     font-family: var(--font-pixelscript);
     font-weight: 400;
     font-size: clamp(2rem, min(7.5vw, 9.5vh), 6.5rem);
     line-height: .98;
-    /* tracking levemente negativo — testado que a Pixelscript aguenta -.015em
-       sem quebrar as ligações do script (mais que isso começa a colar demais) */
     letter-spacing: -.015em;
     text-transform: none;
     margin: 0;
@@ -171,9 +142,6 @@ const styles = `
     top: 52.5%;
     pointer-events: none;
   }
-  /* padding+margin negativa: expande a CAIXA DE CLIP (máscara da entrada) sem
-     mudar o ritmo. A Pixelscript tem capitulares altas e descendentes longas,
-     então o respiro inferior precisa ser maior que o line box convencional. */
   .ph__line {
     position: relative;
     overflow: hidden;
@@ -181,12 +149,8 @@ const styles = `
     padding: .24em .2em .64em .2em;
     margin: -.24em -.2em -.64em -.2em;
   }
-  .ph__line:first-child {
-    z-index: 1; /* under image */
-  }
-  .ph__line:nth-child(n+2) {
-    z-index: 20; /* over image */
-  }
+  .ph__line:first-child { z-index: 1; }
+  .ph__line:nth-child(n+2) { z-index: 20; }
   .ph__line-inner {
     display: block;
     will-change: transform, filter;
@@ -197,8 +161,6 @@ const styles = `
     from { transform: translate3d(0, .3em, 0); filter: blur(.35px); }
     to { transform: translate3d(0, 0, 0); filter: blur(0); }
   }
-  /* Em telas pequenas o mesmo gesto precisa resolver antes: mantém a entrada
-     preferida, mas evita que o LCP espere quase um segundo pela animação. */
   @media (max-width: 767px) {
     .ph__line-inner {
       animation-duration: .48s;
@@ -212,15 +174,12 @@ const styles = `
     font-size: clamp(.95rem, 1.3vw, 1.1rem);
     line-height: 1.5;
   }
-  /* Subtitle positioned with clean left alignment */
   .ph__sub--pocket {
     position: absolute;
     left: 45.6%;
     top: 79%;
-    /* Fixed editorial subtitle width prevents layout reflow */
     width: max-content;
     max-width: 50vw;
-    max-width: none;
     text-align: left;
     text-transform: lowercase;
     font-family: var(--font-subtitle);
@@ -238,7 +197,6 @@ const styles = `
     font-size: clamp(1.9rem, min(6.3vw, 8vh), 5.5rem);
     line-height: 1.02;
   }
-  /* Em notebooks, preserva a mesma composição por proporção. */
   @media (min-width: 721px) and (max-width: 1359px) {
     .ph__title { top: 52.5%; }
     .ph__sub--pocket {
@@ -252,20 +210,7 @@ const styles = `
     font-size: 1.35rem;
     letter-spacing: .01em;
   }
-  .ph__em { font-family: var(--font-head); font-style: italic; font-weight: 800; letter-spacing: -0.01em; }
-  .ph__wave-word { display: inline-block; white-space: nowrap; }
-  .ph__wave-char { display: inline-block; }
-  @keyframes ph-wave {
-    0%, 7%, 100% { transform: translateY(0); }
-    3.5% { transform: translateY(-3px); }
-  }
-  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-    .ph__wave-char {
-      animation: ph-wave 8.52s cubic-bezier(.33, 1, .68, 1) var(--wave-delay) infinite;
-    }
-  }
-
-  /* --- adesivos arrastáveis --- */
+  .ph__em { font-family: var(--font-head); font-style: italic; font-weight: 800; letter-spacing: -.01em; }
   .ph__sticker {
     position: absolute;
     z-index: 2;
@@ -291,7 +236,6 @@ const styles = `
   }
   .ph__clock { display: inline-flex; flex-direction: column; gap: .15rem; }
   .ph__greet {
-    /* OffBit monospace font styling */
     font-family: var(--font-subtitle);
     font-size: 1.2rem;
     text-transform: lowercase;
@@ -322,8 +266,7 @@ const styles = `
       font-size: clamp(1.85rem, 8.8vw, 2.75rem);
       line-height: 1.12;
       letter-spacing: -.015em;
-      margin: 0.75rem 0 0.5rem;
-      translate: none;
+      margin: .75rem 0 .5rem;
       text-align: left;
     }
     .ph__title[data-compact="true"] {
@@ -336,8 +279,7 @@ const styles = `
       top: auto;
       width: 100%;
       max-width: 100%;
-      margin-top: 0.5rem;
-      translate: none;
+      margin-top: .5rem;
       font-size: clamp(.85rem, 3.8vw, 1.05rem);
       line-height: 1.45;
     }
@@ -349,7 +291,7 @@ const styles = `
       left: auto !important;
       right: auto !important;
       top: auto !important;
-      margin-bottom: 0.25rem;
+      margin-bottom: .25rem;
       text-align: left;
     }
     .ph__greet { font-size: 1.1rem; }
@@ -488,10 +430,7 @@ export default function PlaygroundHero({
 
   const canDrag = !isMobile;
 
-  // Functional hero elements with ASCII backdrop integration
   const stickers: Sticker[] = [
-    // Nested dynamically within the canvas negative space
-    // Balances typography within the artwork whitespace
     { key: "clock", left: "58%", top: "12%", rotate: 3, el: <LiveClock /> },
   ];
 
@@ -515,7 +454,6 @@ export default function PlaygroundHero({
         {scrollLabel}
       </span>
 
-      {/* Interactive draggable stamps and badges */}
       {stickers.map((s, i) => (
         <DraggableSticker
           key={s.key}
@@ -529,9 +467,7 @@ export default function PlaygroundHero({
         />
       ))}
 
-      {/* Scatter navigation tags */}
       {children}
-
 
       <h1
         className="ph__title"
@@ -549,11 +485,7 @@ export default function PlaygroundHero({
           </span>
         ))}
       </h1>
-      {/* frase no espaço em branco da onda (concavidade), alinhada à ESQUERDA
-          e em OffBit — abaixo do título pra não encostar nele */}
-      <p
-        className="ph__sub ph__sub--pocket"
-      >
+      <p className="ph__sub ph__sub--pocket">
         <span>
           <span className="ph__sub-line">{sub}</span>
           <span className="ph__em">{subHighlight}</span>

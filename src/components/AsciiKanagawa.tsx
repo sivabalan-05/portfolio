@@ -2,19 +2,14 @@
 
 import { useEffect, useRef } from "react";
 
-// 12fps frame pacing for smooth ambient wave motion with minimal CPU footprint.
 const FRAME_MS = 1000 / 12;
 
-// Curated delicate ASCII glyph ramp for high-contrast wave shaders.
-const SITE_GIBBON_RAMP = [
+const GLYPH_RAMP = [
   "·", "°", "⠂", "⠄", "⠆", "⠒", "⠤", "o", "✳︎", "✦", "✧", "⋆", "♡", "✿", "₊", "˚",
   "≈", "~", "⠶", "⠲", "⠴", "⠛", "⠿",
 ];
 
-const UNIFIED_COLOR = "#173b58"; // Deep navy shade index
-// A última linha visível da gravura está em y=996; os 37 px restantes do
-// arquivo são transparentes. Alinhar por esse limite aproxima a tinta do
-// ticker sem recortar nenhum caractere da obra.
+const UNIFIED_COLOR = "#173b58";
 const ART_VISIBLE_BOTTOM_RATIO = 996 / 1034;
 
 const hash = (x: number, y: number, seed = 0) => {
@@ -22,7 +17,6 @@ const hash = (x: number, y: number, seed = 0) => {
   return value - Math.floor(value);
 };
 
-// IMPLEMENTAÇÃO EXATA DA CLASSE FrameLoop DE GIBBONJOYEUX
 class FrameLoop {
   frames: number;
   minVal: number;
@@ -101,8 +95,6 @@ export default function AsciiKanagawa({
     const image = new Image();
     image.src = src;
 
-    // No mobile a obra continua visível, mas é desenhada uma única vez. Canvas
-    // não vira candidato de LCP e evita todo o mapa, partículas e loop animado.
     if (!interactivePointer.matches) {
       let staticWidth = 0;
       let staticHeight = 0;
@@ -175,7 +167,7 @@ export default function AsciiKanagawa({
       speed: 0.4 + hash(index, 9, 1) * 0.9,
       arc: hash(index, 2, 7),
       type: index % 4,
-      glyph: SITE_GIBBON_RAMP[index % SITE_GIBBON_RAMP.length],
+      glyph: GLYPH_RAMP[index % GLYPH_RAMP.length],
     }));
 
     const sampleCanvas = document.createElement("canvas");
@@ -194,7 +186,6 @@ export default function AsciiKanagawa({
             width / image.naturalWidth,
             height / (image.naturalHeight * ART_VISIBLE_BOTTOM_RATIO),
           );
-      // Desktop: zoom uniforme e recorte. Nunca estica os eixos separadamente.
       const scale = mobile ? baseScale : baseScale * 1.08;
       drawWidth = image.naturalWidth * scale;
       drawHeight = image.naturalHeight * scale;
@@ -206,8 +197,7 @@ export default function AsciiKanagawa({
         : 0;
     }
 
-    // Gerador do mapa de ruído de GibbonJoyeux focado na crista marcada da onda
-    function buildGibbonWaveMap() {
+    function buildWaveMap() {
       if (!image.naturalWidth || !image.naturalHeight || !sampleCtx) return;
       const mapWidth = 160;
       const mapHeight = Math.max(10, Math.round(mapWidth / (image.naturalWidth / image.naturalHeight)));
@@ -219,7 +209,6 @@ export default function AsciiKanagawa({
       const pixels = sampleCtx.getImageData(0, 0, mapWidth, mapHeight).data;
       const totalCells = mapWidth * mapHeight;
 
-      // 1. CREATE MAP
       const rawMap = new Float32Array(totalCells);
       for (let y = 0; y < mapHeight; y += 1) {
         for (let x = 0; x < mapWidth; x += 1) {
@@ -227,7 +216,6 @@ export default function AsciiKanagawa({
         }
       }
 
-      // 2. BLUR MAP (35 passos de suavização)
       const smoothed = new Float32Array(totalCells);
       const BLUR_STEPS = 35;
       for (let step = 0; step < BLUR_STEPS; step += 1) {
@@ -244,12 +232,9 @@ export default function AsciiKanagawa({
         rawMap.set(smoothed);
       }
 
-      // 3. FINALIZE MAP (FrameLoops de GibbonJoyeux)
       const waveRidgePoints: MutationPoint[] = [];
-      // Movimento lento e editorial: visível aos poucos, sem deixar a gravura
-      // com aparência de glitch ou superfície nervosa.
       const FRAMES = 150;
-      const MAX_CHAR_IDX = SITE_GIBBON_RAMP.length - 1;
+      const MAX_CHAR_IDX = GLYPH_RAMP.length - 1;
 
       for (let y = 1; y < mapHeight - 1; y += 1) {
         for (let x = 1; x < mapWidth - 1; x += 1) {
@@ -292,8 +277,6 @@ export default function AsciiKanagawa({
             frameLoop: loopObj,
           };
 
-          // O movimento vive principalmente nas bordas. Alguns raros pontos
-          // internos mantêm continuidade sem descaracterizar a impressão.
           const sparseInterior =
             pt.strength > 0.62 && (pt.col * 3 + pt.row * 5) % 17 === 0;
           if (isBoundary || sparseInterior) {
@@ -319,17 +302,14 @@ export default function AsciiKanagawa({
       ctx.textBaseline = "middle";
     }
 
-    // Atlas dos glifos do contorno. fillText por ponto (~1900/quadro) era DE
-    // LONGE o maior custo de runtime do site — 80mil fillText a cada 2s. Pré-
-    // renderiza os 23 glifos UMA vez e usa drawImage (~6x mais barato que
-    // fillText, que rasteriza a fonte a cada chamada). Mesmo visual, fração do custo.
-    let gibbonAtlas: HTMLCanvasElement | null = null;
-    let gibbonAtlasTile = 0;
-    let gibbonAtlasKey = 0;
-    function buildGibbonAtlas(patchSize: number) {
+    let glyphAtlas: HTMLCanvasElement | null = null;
+    let glyphAtlasTile = 0;
+    let glyphAtlasKey = 0;
+
+    function buildGlyphAtlas(patchSize: number) {
       const tile = Math.ceil(patchSize * dpr) + 6;
       const sheet = document.createElement("canvas");
-      sheet.width = tile * SITE_GIBBON_RAMP.length;
+      sheet.width = tile * GLYPH_RAMP.length;
       sheet.height = tile;
       const c = sheet.getContext("2d");
       if (!c) return;
@@ -337,28 +317,26 @@ export default function AsciiKanagawa({
       c.textAlign = "center";
       c.textBaseline = "middle";
       c.fillStyle = UNIFIED_COLOR;
-      for (let i = 0; i < SITE_GIBBON_RAMP.length; i += 1) {
-        const ch = SITE_GIBBON_RAMP[i];
+      for (let i = 0; i < GLYPH_RAMP.length; i += 1) {
+        const ch = GLYPH_RAMP[i];
         if (ch && ch !== " ") c.fillText(ch, i * tile + tile / 2, tile / 2);
       }
-      gibbonAtlas = sheet;
-      gibbonAtlasTile = tile;
-      gibbonAtlasKey = Math.round(patchSize);
+      glyphAtlas = sheet;
+      glyphAtlasTile = tile;
+      glyphAtlasKey = Math.round(patchSize);
     }
 
-    function drawGibbonContourLoop() {
+    function drawContourLoop() {
       if (reduceMotion || !contourPoints.length) return;
       const patchSize = Math.max(9, (drawWidth / mutationMapWidth) * 1.18);
-      if (!gibbonAtlas || gibbonAtlasKey !== Math.round(patchSize)) buildGibbonAtlas(patchSize);
-      if (!gibbonAtlas) return;
+      if (!glyphAtlas || glyphAtlasKey !== Math.round(patchSize)) buildGlyphAtlas(patchSize);
+      if (!glyphAtlas) return;
 
-      const tile = gibbonAtlasTile;
+      const tile = glyphAtlasTile;
       const half = patchSize / 2;
       const eraseSize = patchSize * 0.48;
       ctx.save();
 
-      // Remove parcialmente o glifo-base antes da substituição. A passagem
-      // pequena torna a mudança legível sem abrir buracos agressivos na arte.
       for (let i = 0; i < contourPoints.length; i += 1) {
         const pt = contourPoints[i];
         const x = drawX + pt.x * drawWidth;
@@ -372,10 +350,10 @@ export default function AsciiKanagawa({
         if (!pt.frameLoop) continue;
         const charIdx = Math.round(pt.frameLoop.value);
         pt.frameLoop.inc();
-        const idx = charIdx % SITE_GIBBON_RAMP.length;
+        const idx = charIdx % GLYPH_RAMP.length;
         const x = drawX + pt.x * drawWidth;
         const y = drawY + pt.y * drawHeight;
-        ctx.drawImage(gibbonAtlas, idx * tile, 0, tile, tile, x - half, y - half, patchSize, patchSize);
+        ctx.drawImage(glyphAtlas, idx * tile, 0, tile, tile, x - half, y - half, patchSize, patchSize);
       }
       ctx.restore();
     }
@@ -426,7 +404,7 @@ export default function AsciiKanagawa({
           y = drawY + drawHeight * (0.18 + particle.seed * 0.22 - life * 0.055 + driftY);
         }
 
-        const glyph = SITE_GIBBON_RAMP[(particle.index + Math.floor(seconds * 6.5)) % SITE_GIBBON_RAMP.length];
+        const glyph = GLYPH_RAMP[(particle.index + Math.floor(seconds * 6.5)) % GLYPH_RAMP.length];
         ctx.fillText(glyph, x, y);
       }
 
@@ -438,13 +416,8 @@ export default function AsciiKanagawa({
       const seconds = time * 0.001;
       ctx.clearRect(0, 0, width, height);
 
-      // 1. GRAVURA PRINCIPAL ESTÁTICA POSICIONADA MAIS PARA O TOPO
       drawBase();
-
-      // 2. FLUXO DE CARACTERES DELICADOS COM FrameLoop DE GIBBONJOYEUX
-      drawGibbonContourLoop();
-
-      // 3. ESPUMA ASCII — loop autônomo, sem interação.
+      drawContourLoop();
       drawSpray(seconds);
     }
 
@@ -478,7 +451,7 @@ export default function AsciiKanagawa({
 
     const handleImageLoad = () => {
       resize();
-      buildGibbonWaveMap();
+      buildWaveMap();
       draw(performance.now());
     };
 

@@ -7,152 +7,124 @@ export type ConstellationNode = {
   detail: string;
 };
 
-interface Props {
-  nodes: ConstellationNode[];
-}
-
-export default function SkillConstellation({ nodes }: Props) {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+export default function SkillConstellation({ nodes }: { nodes: ConstellationNode[] }) {
+  const [active, setActive] = useState<number | null>(null);
 
   return (
     <div className="rm-skills-index">
       <style>{`
         .rm-skills-index {
-          display: flex;
-          flex-direction: column;
           width: 100%;
           font-family: var(--font-body);
           color: var(--ink);
         }
-        
         .rm-skill-row {
           position: relative;
-          display: flex;
-          flex-direction: column;
-          padding: 1.2rem 0;
+          padding: 1.15rem 0;
           cursor: crosshair;
         }
-
         .rm-skill-header {
           display: flex;
           justify-content: space-between;
           align-items: baseline;
-          font-size: clamp(.65rem, .9vw, .95rem);
+          font-size: clamp(.68rem, .9vw, .95rem);
           text-transform: uppercase;
           letter-spacing: .08em;
-          z-index: 2;
         }
-
-        .rm-skill-title {
-          display: flex;
-          align-items: baseline;
-        }
-
-        .rm-skill-number {
-          opacity: 0.4;
-          margin-right: 1.5rem;
+        .rm-skill-num {
+          opacity: .4;
+          margin-right: 1.25rem;
           font-family: var(--font-subtitle), monospace;
           font-variant-numeric: tabular-nums;
         }
-
         .rm-skill-label {
           font-weight: 600;
-          transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+          transition: transform .25s cubic-bezier(.2, .8, .2, 1);
           display: inline-block;
         }
-        
         .rm-skill-row:hover .rm-skill-label {
-          transform: translateX(8px);
+          transform: translateX(6px);
         }
-
         .rm-skill-icon {
           opacity: 0;
           transform: rotate(-90deg);
-          transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-          font-size: 0.8rem;
+          transition: transform .3s ease, opacity .3s ease;
+          font-size: .8rem;
         }
-
-        .rm-skill-row:hover .rm-skill-icon {
+        .rm-skill-row:hover .rm-skill-icon,
+        .rm-skill-row[data-open="true"] .rm-skill-icon {
           opacity: 1;
           transform: rotate(0deg);
         }
-
-        .rm-skill-detail-wrapper {
+        .rm-skill-body {
           overflow: hidden;
           max-height: 0;
           opacity: 0;
-          transition:
-            max-height .4s cubic-bezier(.23, 1, .32, 1),
-            opacity .3s ease;
+          transition: max-height .35s cubic-bezier(.16, 1, .3, 1), opacity .25s ease;
         }
-
-        .rm-skill-row[data-open="true"] .rm-skill-detail-wrapper {
+        .rm-skill-row[data-open="true"] .rm-skill-body {
           max-height: 8rem;
           opacity: 1;
         }
-
         .rm-skill-detail {
-          padding-top: 0.8rem;
-          padding-left: 3rem;
+          padding: .75rem 0 0 2.8rem;
           font-family: var(--font-serif), serif;
           font-size: clamp(.9rem, 1.2vw, 1.15rem);
-          text-transform: none;
-          letter-spacing: normal;
-          opacity: 0.75;
+          opacity: .75;
           font-style: italic;
           line-height: 1.5;
         }
-
-        .rm-skill-divider {
+        .rm-skill-border {
           position: absolute;
           bottom: 0;
           left: 0;
           width: 100%;
           height: 1px;
           background: repeating-linear-gradient(
-            to right,
-            color-mix(in srgb, var(--ink) 35%, transparent),
-            color-mix(in srgb, var(--ink) 35%, transparent) 3px,
-            transparent 3px,
-            transparent 8px
+            90deg,
+            color-mix(in srgb, var(--ink) 35%, transparent) 0 3px,
+            transparent 3px 8px
           );
+        }
+        @media (max-width: 768px) {
+          .rm-skill-detail {
+            padding-left: 2rem;
+            font-size: .95rem;
+          }
         }
       `}</style>
       
-      {/* Top divider */}
-      <div className="rm-skill-divider" style={{ top: 0, bottom: 'auto' }} />
+      <div className="rm-skill-border" style={{ top: 0, bottom: "auto" }} />
 
-      {nodes.map((node, i) => {
-        const isHovered = hoveredIndex === i;
-        const number = (i + 1).toString().padStart(2, "0");
-        
+      {nodes.map((item, i) => {
+        const isOpen = active === i;
+        const num = String(i + 1).padStart(2, "0");
+
         return (
           <div 
-            key={i} 
+            key={item.label} 
             className="rm-skill-row"
-            data-open={isHovered ? "true" : "false"}
+            data-open={isOpen}
             tabIndex={0}
-            onMouseEnter={() => setHoveredIndex(i)}
-            onMouseLeave={() => setHoveredIndex(null)}
-            onFocus={() => setHoveredIndex(i)}
-            onBlur={() => setHoveredIndex(null)}
-            onClick={() => setHoveredIndex(isHovered ? null : i)}
+            onMouseEnter={() => setActive(i)}
+            onMouseLeave={() => setActive(null)}
+            onFocus={() => setActive(i)}
+            onBlur={() => setActive(null)}
+            onClick={() => setActive(isOpen ? null : i)}
           >
             <div className="rm-skill-header">
-              <div className="rm-skill-title">
-                <span className="rm-skill-number">{number} /</span>
-                <span className="rm-skill-label">{node.label}</span>
+              <div>
+                <span className="rm-skill-num">{num} /</span>
+                <span className="rm-skill-label">{item.label}</span>
               </div>
-              <span className="rm-skill-icon">✳︎</span>
+              <span className="rm-skill-icon" aria-hidden="true">✳︎</span>
             </div>
 
-            <div className="rm-skill-detail-wrapper" aria-hidden={!isHovered}>
-              <div className="rm-skill-detail">
-                {node.detail}
-              </div>
+            <div className="rm-skill-body" aria-hidden={!isOpen}>
+              <div className="rm-skill-detail">{item.detail}</div>
             </div>
 
-            <div className="rm-skill-divider" />
+            <div className="rm-skill-border" />
           </div>
         );
       })}

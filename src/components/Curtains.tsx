@@ -15,13 +15,11 @@ const TransitionContext = createContext<TransitionContextProps>({
 export const usePageTransition = () => useContext(TransitionContext);
 
 export default function Curtains() {
-  // Keeping a default export placeholder to prevent any broken imports in other files
   return null;
 }
 
 type Status = "idle" | "entrance" | "exit";
 
-// Total transition duration across route navigation
 const EXIT = 650;
 const ENTER = 650;
 
@@ -41,7 +39,7 @@ const transitionStyles = `
 
 function PixelGrid({ status, richMotion }: { status: Status; richMotion: boolean }) {
   const [grid, setGrid] = useState({ cols: 0, rows: 0 });
-  const TILE_SIZE = 80; // Fixed tile size
+  const TILE_SIZE = 80;
   const isMoving = status !== "idle";
   const isExit = status === "exit";
 
@@ -57,13 +55,10 @@ function PixelGrid({ status, richMotion }: { status: Status; richMotion: boolean
     return () => window.removeEventListener("resize", calc);
   }, []);
 
-  // Tile grid is only mounted during active navigation
-  // transparentes ficavam montados durante toda a visita.
   if (!isMoving || grid.cols === 0) return null;
 
   const total = grid.cols * grid.rows;
 
-  // Se o usuário pedir reduzir movimento, só dá fade no contêiner todo
   if (!richMotion) {
     return (
       <div
@@ -101,11 +96,7 @@ function PixelGrid({ status, richMotion }: { status: Status; richMotion: boolean
         const maxDist = grid.cols + grid.rows - 2;
         const dist = x + y;
         
-        // normaliza de 0 a 1
         const p = maxDist > 0 ? dist / maxDist : 0;
-        
-        // Efeito Wavefront / Diagonal sweep com 'noise' (dither):
-        // Adicionando variação aleatória suaviza a "linha dura" da onda.
         const baseDelay = isExit ? p * 0.35 : (1 - p) * 0.35;
         const noise = (((i * 73) % 101) / 101) * 0.12;
         const delay = baseDelay + noise;
@@ -119,7 +110,6 @@ function PixelGrid({ status, richMotion }: { status: Status; richMotion: boolean
         );
       })}
       
-      {/* Textura Global Única sobre a grade para evitar lag */}
       <div 
         style={{
           position: "absolute",
@@ -130,7 +120,7 @@ function PixelGrid({ status, richMotion }: { status: Status; richMotion: boolean
           backgroundBlendMode: "multiply, multiply, normal",
           opacity: 1,
           transition: "opacity 0.4s ease",
-          zIndex: 10, // above the grid pixels
+          zIndex: 10,
         }}
       />
     </div>
@@ -147,7 +137,6 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
   const exitDuration = richMotion ? EXIT : 0;
   const enterDuration = richMotion ? ENTER : 0;
 
-  // Ao trocar de rota, roda a entrada (revela o conteúdo novo) — exceto no 1º load.
   useEffect(() => {
     if (isFirstLoad.current) {
       isFirstLoad.current = false;
@@ -164,7 +153,6 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
     setStatus("exit");
   }, [pathname, status]);
 
-  // Intercepta cliques internos globalmente.
   useEffect(() => {
     const handleGlobalClick = (e: MouseEvent) => {
       const anchor = (e.target as HTMLElement).closest("a");
@@ -173,7 +161,6 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
       const href = anchor.getAttribute("href");
       if (!href) return;
 
-      // Ignora links não-roteáveis: externos, âncoras, arquivos, nova aba.
       if (
         href.startsWith("/") &&
         !href.startsWith("/#") &&
@@ -193,7 +180,6 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
     return () => document.removeEventListener("click", handleGlobalClick);
   }, [transitionTo]);
 
-  // Quando a saída termina, troca a rota (o conteúdo já está invisível).
   useEffect(() => {
     if (status === "exit" && pendingHref) {
       const timer = setTimeout(() => {
@@ -205,7 +191,6 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
     }
   }, [status, pendingHref, router, exitDuration]);
 
-  // O wrapper persiste entre navegações, então o cross-dissolve é contínuo.
   const wrapperStyle: React.CSSProperties = {
     width: "100%",
     minHeight: "100vh",

@@ -135,9 +135,6 @@ const styles = `
     background: color-mix(in srgb, var(--ink) 72%, transparent);
     border-radius: 0;
   }
-  /* Enquanto o arraste ou o deslize estão no comando, o encaixe do navegador
-     sai da frente: quem posiciona é o JS, e ele termina em cima do ponto de
-     encaixe — assim ligar o snap de volta não puxa a fita de repente. */
   .sw__viewport[data-dragging="true"],
   .sw__viewport[data-gliding="true"] {
     scroll-snap-type: none;
@@ -183,10 +180,6 @@ const styles = `
     opacity: 0;
     transition: opacity var(--duration-slow) var(--ease-out);
   }
-  /* Moldura única para todos os cartões: as capas têm proporções diferentes
-     (do pôster em pé da ondularis ao cartaz deitado do graduation) e, soltas,
-     deixavam as legendas em alturas diferentes. Aqui cada capa entra inteira,
-     como gravura em passe-partout, e a fita corre com uma linha de base só. */
   .sw__media {
     position: relative;
     display: block;
@@ -517,20 +510,10 @@ export default function ScatteredWorks({ items }: { items: IndexItem[] }) {
     if (!drag.moved) {
       const delta = event.clientX - drag.startX;
       if (Math.abs(delta) <= DRAG_THRESHOLD) return;
-      // Reancorar na borda da folga: o gesto vira arraste sem salto, e um
-      // primeiro movimento largo não perde o caminho que já andou.
       drag.moved = true;
       drag.startX = drag.startX + Math.sign(delta) * DRAG_THRESHOLD;
       drag.startScrollLeft = viewport.scrollLeft;
-      // A captura so entra aqui, depois do limiar. Ligada ja no pointerdown,
-      // ela redirecionaria o pointerup e o click para este viewport e os
-      // <Link> dos cards nunca receberiam o clique - a galeria parava de abrir
-      // os projetos. Mesmo motivo do arrasto das etiquetas do hero.
       viewport.setPointerCapture(event.pointerId);
-      // O atributo vai no DOM aqui mesmo, e nao so pelo estado do React: e ele
-      // que desliga o scroll-snap: inline mandatory, e o snap precisa ja estar
-      // desligado quando o scrollLeft logo abaixo for escrito. Esperando o
-      // proximo render, o primeiro passo do arrasto voltava para o snap.
       viewport.dataset.dragging = "true";
       setDragging(true);
     }
@@ -567,8 +550,6 @@ export default function ScatteredWorks({ items }: { items: IndexItem[] }) {
       return;
     }
 
-    // Quem soltou parado não merece arremesso: só conta o impulso de quem
-    // ainda estava movendo a mão no instante em que soltou.
     const stale = event.timeStamp - drag.lastTime > 70;
     const velocity = stale || Math.abs(drag.velocity) < FLICK_THRESHOLD
       ? 0

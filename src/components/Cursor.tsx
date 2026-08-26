@@ -18,10 +18,6 @@ type InkDot = {
   vy: number;
 };
 
-/* Paleta monocromática, casada com a identidade atual (bege + tinta escura).
- * Antes era o neon Y2K rosa/lilás da id velha — era ele que dava o "brilho
- * artificial". Agora: tinta escura dominante + cinzas quentes + faísca de creme
- * ocasional, e o glow é translúcido e baixo (sombra de tinta, não neon). */
 const INKS = [
   { color: "#1c1b18", glow: "rgba(28,27,24,.30)" },
   { color: "#1c1b18", glow: "rgba(28,27,24,.24)" },
@@ -30,7 +26,7 @@ const INKS = [
   { color: "#f6f1e6", glow: "rgba(255,255,255,.34)" },
   { color: "#ffffff", glow: "rgba(255,255,255,.40)" },
 ] as const;
-/* Editorial glyph sparkle trail */
+
 const SYMBOLS = ["✦", "✧", "⋆", "✳", "·", "°", "♡", "⊹", "+"];
 const MOTION_FAST = 0.2;
 const MOTION_EASE_STANDARD = [0, 0, 0.2, 1] as const;
@@ -73,7 +69,7 @@ export default function Cursor() {
 
     const render = (time: number) => {
       frame = 0;
-      const dt = Math.min(2.5, (time - lastTime) / 16.666); 
+      const dt = Math.min(2.5, (time - lastTime) / 16.666);
       lastTime = time;
 
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
@@ -122,6 +118,7 @@ export default function Cursor() {
         frame = requestAnimationFrame(render);
       }
     };
+
     return () => {
       window.removeEventListener("resize", resize);
       cancelAnimationFrame(frame);
@@ -153,9 +150,6 @@ export default function Cursor() {
       const dy = y - lastTrailPos.current.y;
       const distance = Math.hypot(dx, dy);
 
-      // Mede desde a última emissão, não desde o último evento. Assim mouses
-      // de polling alto também formam um traço contínuo sem criar partículas
-      // demais por frame.
       if (finePointer.matches && distance >= TRAIL_SPACING) {
         const steps = Math.min(
           MAX_TRAIL_STEPS,
