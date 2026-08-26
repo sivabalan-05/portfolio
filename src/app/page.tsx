@@ -208,6 +208,43 @@ const rmStyles = `
     color: var(--acid);
     font-size: 0.75rem;
   }
+  .rm-tools {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  .rm-meta-list {
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .rm-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.85rem 0;
+    font-family: var(--font-body);
+    font-size: var(--type-label);
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .rm-meta-label {
+    opacity: 0.6;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .rm-meta-val {
+    text-align: right;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    min-width: 0;
+    max-width: 72%;
+  }
 
   /* Skills & Tech Section */
   .rm-skills-grid {
@@ -590,16 +627,16 @@ function HomeContent() {
                 <AsciiDivider className="rm-divider" pattern={STITCH_DIVIDER} fullWidth opacity={0.52} />
               </div>
               <SkillConstellation nodes={constellationSkills} />
-              <div style={{ marginTop: "2rem" }}>
+              <div className="rm-meta-list">
                 <AsciiDivider opacity={0.45} />
-                <div style={{ display: "flex", justifyContent: "space-between", padding: ".85rem 0", fontFamily: "var(--font-body)", fontSize: "var(--type-label)", textTransform: "lowercase", letterSpacing: ".06em" }}>
-                  <span style={{ opacity: 0.6 }}>status</span>
-                  <span style={{ fontWeight: 600 }}>{personalInfo.status}</span>
+                <div className="rm-meta-row">
+                  <span className="rm-meta-label">status</span>
+                  <span className="rm-meta-val" style={{ fontWeight: 600 }}>{personalInfo.status}</span>
                 </div>
                 <AsciiDivider opacity={0.45} />
-                <div style={{ display: "flex", justifyContent: "space-between", padding: ".85rem 0", fontFamily: "var(--font-body)", fontSize: "var(--type-label)", textTransform: "lowercase", letterSpacing: ".06em" }}>
-                  <span style={{ opacity: 0.6 }}>location</span>
-                  <span>{personalInfo.location}</span>
+                <div className="rm-meta-row">
+                  <span className="rm-meta-label">location</span>
+                  <span className="rm-meta-val">{personalInfo.location}</span>
                 </div>
                 <AsciiDivider opacity={0.45} />
               </div>
