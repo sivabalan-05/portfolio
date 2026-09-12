@@ -48,7 +48,7 @@ export const personalInfo = {
   github: "https://github.com/sivabalan-05",
   linkedin: "https://www.linkedin.com/in/sivabalan-05d",
   twitter: "https://x.com/sivabalan___",
-  resumeUrl: "https://drive.google.com/file/d/1TQAiO3Slwics3pcjxg0vv22AwKpvR9lf/view?usp=share_link",
+  resumeUrl: "https://drive.google.com/file/d/1tn4n2FbAeqKQx8Hy0kxUDK6AZOLvsh4G/view?usp=share_link",
   status: "available for work",
   statusSub: "open to web development & AI engineering internships and roles",
   heroHeadlines: [
